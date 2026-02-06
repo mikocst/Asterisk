@@ -1,8 +1,11 @@
 import React from 'react'
+import NoteMenuHeader from './NoteMenuHeader'
 
 const NoteMenu = () => {
   return (
-    <div>NoteMenu</div>
+    <div>
+        <NoteMenuHeader/>
+    </div>
   )
 }
 
