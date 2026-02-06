@@ -1,4 +1,4 @@
-# Astro Starter Kit: Minimal
+# Asterisk - Productivity Hub
 
 ```sh
 npm create astro@latest -- --template minimal
