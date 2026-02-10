@@ -1,6 +1,8 @@
-import React from 'react'
+import { use } from 'react'
+import { NotebookContext } from '../NotebookContext'
 
 const NoteArea = () => {
+
   return (
     <div className = "h-full w-full flex flex-col justify-center items-center gap-2">
         <div className = "relative flex justify-center items-center px-12 py-10 bg-gray-50 rounded-full">
