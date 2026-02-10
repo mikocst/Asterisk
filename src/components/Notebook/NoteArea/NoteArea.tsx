@@ -1,7 +1,7 @@
-import { use } from 'react'
-import { NotebookContext } from '../NotebookContext'
+import { useNotebook } from "../NotebookContext"
 
 const NoteArea = () => {
+  const {creatingNote, setCreatingNote} = useNotebook();
 
   return (
     <div className = "h-full w-full flex flex-col justify-center items-center gap-2">

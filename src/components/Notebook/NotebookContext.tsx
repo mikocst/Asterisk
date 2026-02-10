@@ -1,4 +1,4 @@
-import { createContext, useContext, useState} from "react";
+import React, { createContext, useContext, useState} from "react";
 
 interface NotebookProviderProps {
     children: React.ReactNode
@@ -49,3 +49,5 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         </NotebookContext.Provider>
     )
 }
+
+export default NotebookProvider
