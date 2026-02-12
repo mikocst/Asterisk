@@ -1,9 +1,9 @@
 ---
  import '../styles/global.css'
  import NotebookLayout from '../layouts/NoteLayout.astro'
- import NoteUI from '../components/Notebook/index.tsx'
+ import NoteUI from '../components/Notebook/index'
 ---
 
 <NotebookLayout>
-	<NoteUI/>
+	<NoteUI client:load/>
 </NotebookLayout>
