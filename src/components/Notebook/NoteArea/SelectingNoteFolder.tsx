@@ -3,7 +3,7 @@ import { Folder } from "feather-icons-react"
 const SelectingNoteFolder = () => {
   return (
     <div className = "flex flex-row justify-between">
-            <div className = "flex flex-row gap-2">
+            <div className = "flex flex-row gap-2 items-center">
                 <Folder size={"20px"} className = "text-black/50"/>
                 <p className = "text-black/50">Select a Folder</p>
             </div>
