@@ -7,7 +7,9 @@ const NoteArea = () => {
 
   return (
     <div className = "w-full h-full">
-      <NoteAreaActive/>
+      {creatingNote ? 
+        <NoteAreaActive/> : <NoteAreaIdle/> 
+      }
     </div>
   )
 }
