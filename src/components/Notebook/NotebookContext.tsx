@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState} from "react";
+import {type Note } from "./types";
 
 interface NotebookProviderProps {
     children: React.ReactNode
@@ -9,8 +10,10 @@ export interface NoteBookContextProps {
     setCreatingNote: (val: boolean) => void
     editingNote: boolean
     setEditingNote: (val: boolean) => void
-    activeNoteId: number | null
-    setActiveNoteId: (id: number | null) => void
+    activeNoteId: string | null
+    setActiveNoteId: (id: string | null) => void
+    notes: Note[];
+    setNotes: (noteList: Note[]) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -30,7 +33,8 @@ export const useNotebook = () => {
 export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [creatingNote, setCreatingNote] = useState<boolean>(false);
     const [editingNote, setEditingNote] = useState<boolean>(false);
-    const [activeNoteId, setActiveNoteId] = useState<number | null>(null);
+    const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [notes, setNotes] = useState<Note[]>([])
 
     const value = {
         creatingNote,
@@ -40,7 +44,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         setEditingNote,
 
         activeNoteId,
-        setActiveNoteId
+        setActiveNoteId,
+
+        notes,
+        setNotes
+
     }
 
     return (
