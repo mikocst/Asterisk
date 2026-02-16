@@ -4,15 +4,14 @@ import NoteMenu from './Menu/NoteMenu'
 import NoteArea from './NoteArea/NoteArea'
 
 const NotebookApp = () => {
-  const {creatingNote, setCreatingNote} = useNotebook();
-
-  console.log(creatingNote)
+  const {setCreatingNote, setActiveNoteId} = useNotebook();
 
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {
       if (e.altKey && e.key.toLocaleLowerCase() === 'x') {
         e.preventDefault();
         setCreatingNote(true);
+        setActiveNoteId(null);
       }
     }
 
@@ -20,6 +19,7 @@ const NotebookApp = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
 
   }, [setCreatingNote])
+
   return (
     <div className = "flex flex-row h-full">
         <NoteMenu/>

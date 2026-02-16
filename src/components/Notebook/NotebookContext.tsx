@@ -36,12 +36,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
     const [notes, setNotes] = useState<Note[]>([])
 
-    const handleNote = (e: React.KeyboardEvent) => {
-        if (e.altKey && e.key === 'X') {
-            setCreatingNote(true)
-        }
-    }
-
     const value = {
         creatingNote,
         setCreatingNote,
