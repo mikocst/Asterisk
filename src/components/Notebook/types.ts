@@ -7,8 +7,8 @@ export interface Note {
 }
 
 export interface DraftNote {
-    title: string | "";
+    title: string;
     createdAt: string;
     folder: string;
-    content: string | "";
+    content: string;
 }

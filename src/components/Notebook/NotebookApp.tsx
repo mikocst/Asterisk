@@ -4,7 +4,7 @@ import NoteMenu from './Menu/NoteMenu'
 import NoteArea from './NoteArea/NoteArea'
 
 const NotebookApp = () => {
-  const {setCreatingNote, setActiveNoteId} = useNotebook();
+  const {setCreatingNote, setActiveNoteId, handleDraft} = useNotebook();
 
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {

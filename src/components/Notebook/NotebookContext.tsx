@@ -16,6 +16,8 @@ export interface NoteBookContextProps {
     setNotes: (noteList: Note[]) => void;
     draft: DraftNote | null;
     setDraft: (Draft: DraftNote | null) => void
+    handleDraft: () => void
+    handleUpdateDraft:(key: keyof DraftNote, value: string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -40,7 +42,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [draft, setDraft] = useState<DraftNote | null>(null);
 
     const handleDraft = () => {
-        if (draft && (draft.title.trim() !== "" && draft.content.trim() !== "")) {
+        if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
             let generatedId = crypto.randomUUID();
             const finalNote = {
                 id: generatedId,
@@ -52,6 +54,28 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             setCreatingNote(false)
             setDraft(null)
         }
+    }
+
+    const handleUpdateDraft = (key: keyof DraftNote, value:string) => {
+           setDraft((prev) => {
+            if (!prev) {
+                return (
+                    {
+                        title: "",
+                        content: "",
+                        createdAt: new Date().toISOString(),
+                        folder: "General",
+                        [key]: value
+                    }
+                )
+            }
+
+            else {
+                return (
+                    {...prev, [key]: value}
+                )
+            }
+           })
     }
 
     const value = {
@@ -68,7 +92,10 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         setNotes,
 
         draft,
-        setDraft
+        setDraft,
+
+        handleDraft,
+        handleUpdateDraft
 
     }
 
