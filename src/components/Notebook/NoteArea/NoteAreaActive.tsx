@@ -5,17 +5,22 @@ import { useNotebook } from "../NotebookContext";
 import { useEffect } from "react";
 
 const NoteAreaActive = () => {
-  const {handleDraft, notes} = useNotebook();
+  const {handleDraft, notes, draft, handleUpdateDraft} = useNotebook();
 
-  console.log(notes)
+  console.log(draft)
 
   useEffect(() => {
       return () => {handleDraft()}
-  },[handleDraft])
+  },[])
 
   return (
     <div className = "h-full w-full flex flex-col justify-center gap-2 p-8">
-        <textarea placeholder="New Note" className = "resize-none text-xl h-8 w-full"/>
+        <textarea placeholder="New Note"
+        className = "resize-none text-xl h-8 w-full"
+        onChange={(e) => handleUpdateDraft('title', e.target.value)}
+        >
+          {draft?.title || ""}
+        </textarea>
         <div className = "flex flex-col gap-2 pb-4 border-b border-gray-200">
             <CreatedNoteDate/>
             <SelectingNoteFolder/>

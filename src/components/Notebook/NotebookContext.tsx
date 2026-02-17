@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState} from "react";
+import React, { createContext, useCallback, useContext, useState} from "react";
 import {type Note, type DraftNote } from "./types";
 
 interface NotebookProviderProps {
@@ -41,7 +41,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [draft, setDraft] = useState<DraftNote | null>(null);
 
-    const handleDraft = () => {
+    const handleDraft = useCallback(() => {
         if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
             let generatedId = crypto.randomUUID();
             const finalNote = {
@@ -51,13 +51,13 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             setNotes(prev => [...prev, finalNote])
 
             setActiveNoteId(generatedId)
-            setCreatingNote(false)
             setDraft(null)
+            setCreatingNote(false)
         }
-    }
+    }, [draft])
 
-    const handleUpdateDraft = (key: keyof DraftNote, value:string) => {
-           setDraft((prev) => {
+    const handleUpdateDraft = useCallback((key: keyof DraftNote, value: string) => {
+        setDraft((prev) => {
             if (!prev) {
                 return (
                     {
@@ -76,7 +76,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 )
             }
            })
-    }
+    },[])
 
     const value = {
         creatingNote,
