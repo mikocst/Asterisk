@@ -5,7 +5,7 @@ import { useNotebook } from "../NotebookContext";
 import { useEffect, useRef } from "react";
 
 const NoteAreaActive = () => {
-  const {handleDraft, notes, draft, handleUpdateDraft} = useNotebook();
+  const {handleDraft, draft, handleUpdateDraft} = useNotebook();
 
   const draftRef = useRef(handleDraft);
   draftRef.current = handleDraft;
