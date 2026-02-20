@@ -4,9 +4,8 @@ import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
 
-  const {folders, handleFolders} = useNotebook();
+  const {folders, handleFolders, isMakingFolder, setIsMakingFolder} = useNotebook();
 
-  const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>("")
 
   const handleIsMakingFolder = () => {
@@ -43,7 +42,7 @@ const Folders = () => {
         <div className = "w-full flex flex-col justify-center gap-1">
             {folders.map((folder) => {
                         return (
-                            <div className = "flex flex-row gap-2 p-1 items-center text-gray-500">
+                            <div className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer">
                                 <Folder size = {'16px'}/>
                                 <h3>{folder.title}</h3>
                             </div>

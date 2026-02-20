@@ -18,6 +18,8 @@ export interface NoteBookContextProps {
     setDraft: (Draft: DraftNote | null) => void
     folders: Folders[]
     setFolders: (Folder: Folders[]) => void
+    isMakingFolder: boolean
+    setIsMakingFolder: (making: boolean) => void
     handleDraft: () => void
     handleUpdateDraft:(key: keyof DraftNote, value: string) => void
     handleFolders: (newTitle: string) => void
@@ -44,6 +46,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [draft, setDraft] = useState<DraftNote | null>(null);
     const [folders, setFolders] = useState<Folders[]>([]);
+    const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
 
     const handleDraft = useCallback(() => {
         if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
@@ -111,6 +114,9 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         folders,
         setFolders,
+
+        isMakingFolder,
+        setIsMakingFolder,
 
         handleDraft,
         handleUpdateDraft,

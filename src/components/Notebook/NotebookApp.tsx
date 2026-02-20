@@ -4,7 +4,7 @@ import NoteMenu from './Menu/NoteMenu'
 import NoteArea from './NoteArea/NoteArea'
 
 const NotebookApp = () => {
-  const {setCreatingNote, setActiveNoteId, handleDraft} = useNotebook();
+  const {setCreatingNote, setActiveNoteId, setIsMakingFolder} = useNotebook();
 
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {
@@ -12,6 +12,11 @@ const NotebookApp = () => {
         e.preventDefault();
         setCreatingNote(true);
         setActiveNoteId(null);
+      }
+
+      else if (e.altKey && e.key.toLocaleLowerCase() === 'f') {
+        e.preventDefault();
+        setIsMakingFolder(true)
       }
     }
 
