@@ -12,3 +12,9 @@ export interface DraftNote {
     folder: string;
     content: string;
 }
+
+export interface Folders {
+    title: string;
+    count: number;
+    content: Note[]
+}

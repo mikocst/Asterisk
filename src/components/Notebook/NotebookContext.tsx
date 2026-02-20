@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useState} from "react";
-import {type Note, type DraftNote } from "./types";
+import {type Note, type DraftNote, type Folders } from "./types";
 
 interface NotebookProviderProps {
     children: React.ReactNode
@@ -16,6 +16,8 @@ export interface NoteBookContextProps {
     setNotes: (noteList: Note[]) => void;
     draft: DraftNote | null;
     setDraft: (Draft: DraftNote | null) => void
+    folders: Folders | null
+    setFolders: (Folder: Folders | null) => void
     handleDraft: () => void
     handleUpdateDraft:(key: keyof DraftNote, value: string) => void
 }
@@ -40,6 +42,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
     const [draft, setDraft] = useState<DraftNote | null>(null);
+    const [folders, setFolders] = useState<Folders | null>(null);
 
     const handleDraft = useCallback(() => {
         if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
@@ -93,6 +96,9 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         draft,
         setDraft,
+
+        folders,
+        setFolders,
 
         handleDraft,
         handleUpdateDraft
