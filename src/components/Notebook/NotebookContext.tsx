@@ -20,7 +20,7 @@ export interface NoteBookContextProps {
     setFolders: (Folder: Folders[]) => void
     handleDraft: () => void
     handleUpdateDraft:(key: keyof DraftNote, value: string) => void
-    handleFolders: () => void
+    handleFolders: (newTitle: string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -82,10 +82,10 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
            })
     },[]);
 
-    const handleFolders = useCallback(() => {
+    const handleFolders = useCallback((newTitle: string) => {
         let newFolder = {
             id: crypto.randomUUID(),
-            title: 'New Folder',
+            title: newTitle,
             count: 0,
             content: []
         }

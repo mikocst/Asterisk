@@ -1,21 +1,42 @@
-import React from 'react'
-import { Plus } from 'feather-icons-react'
+import { useState } from 'react';
+import { Plus, Folder } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
 
   const {folders, setFolders} = useNotebook();
 
+  const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
+
+  const handleIsMakingFolder = () => {
+    setIsMakingFolder(true)
+  }
+
   return (
     <div className = "flex flex-col gap-2">
         <div className = "flex flex-row items-center justify-between text-gray-500">
             <h2 className = "text-lg font-medium text-gray-500">FOLDERS</h2>
-            <button className = "cursor-pointer hover:bg-gray-200/50 p-1 rounded-sm">
+            <button
+            onClick = {() => handleIsMakingFolder()}
+            className = "cursor-pointer hover:bg-gray-200/50 p-1 rounded-sm">
                 <Plus size={'20px'}/>
             </button>
         </div>
-        <div className = "w-full flex justify-center">
-            <p className = "text-sm text-gray-400">No Notes Favorited</p>
+        <div className = "w-full flex flex-col justify-center gap-1">
+            {folders.map((folder) => {
+                        return (
+                            <div className = "flex flex-row gap-1 p-1">
+                                <Folder size = {'20px'}/>
+                                <h3>{folder.title}</h3>
+                            </div>
+                        )
+            })}
+            {isMakingFolder && 
+            <input placeholder='Enter Folder Name'></input>
+            }
+            {(folders.length === 0 && !isMakingFolder) && 
+            <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
+            }
         </div>
     </div>
   )
