@@ -16,10 +16,11 @@ export interface NoteBookContextProps {
     setNotes: (noteList: Note[]) => void;
     draft: DraftNote | null;
     setDraft: (Draft: DraftNote | null) => void
-    folders: Folders | null
-    setFolders: (Folder: Folders | null) => void
+    folders: Folders[]
+    setFolders: (Folder: Folders[]) => void
     handleDraft: () => void
     handleUpdateDraft:(key: keyof DraftNote, value: string) => void
+    handleFolders: () => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -42,7 +43,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
     const [draft, setDraft] = useState<DraftNote | null>(null);
-    const [folders, setFolders] = useState<Folders | null>(null);
+    const [folders, setFolders] = useState<Folders[]>([]);
 
     const handleDraft = useCallback(() => {
         if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
@@ -79,7 +80,18 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 )
             }
            })
-    },[])
+    },[]);
+
+    const handleFolders = useCallback(() => {
+        let newFolder = {
+            id: crypto.randomUUID(),
+            title: 'New Folder',
+            count: 0,
+            content: []
+        }
+
+        setFolders(prev => [...prev, newFolder])
+    }, [])
 
     const value = {
         creatingNote,
@@ -101,8 +113,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         setFolders,
 
         handleDraft,
-        handleUpdateDraft
-
+        handleUpdateDraft,
+        handleFolders
     }
 
     return (

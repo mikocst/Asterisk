@@ -1,12 +1,16 @@
 import React from 'react'
 import { Plus } from 'feather-icons-react'
+import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
+
+  const {folders, setFolders} = useNotebook();
+
   return (
     <div className = "flex flex-col gap-2">
         <div className = "flex flex-row items-center justify-between text-gray-500">
             <h2 className = "text-lg font-medium text-gray-500">FOLDERS</h2>
-            <button className = "cursor-pointer">
+            <button className = "cursor-pointer hover:bg-gray-200/50 p-1 rounded-sm">
                 <Plus size={'20px'}/>
             </button>
         </div>
