@@ -4,12 +4,17 @@ import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
 
-  const {folders, setFolders} = useNotebook();
+  const {folders} = useNotebook();
 
   const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState<string>("")
 
   const handleIsMakingFolder = () => {
     setIsMakingFolder(true)
+  }
+
+  const handleFolderName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFolderName(e.target.value)
   }
 
   return (
@@ -32,7 +37,13 @@ const Folders = () => {
                         )
             })}
             {isMakingFolder && 
-            <input placeholder='Enter Folder Name'></input>
+                <div className = "flex flex-row gap-1 p-1">
+                    <Folder size = {'20px'}/>
+                    <input
+                    onChange={handleFolderName} 
+                    value = {folderName}
+                    placeholder='Enter Folder Name'/>
+                </div>
             }
             {(folders.length === 0 && !isMakingFolder) && 
             <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
