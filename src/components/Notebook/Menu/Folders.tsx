@@ -4,7 +4,7 @@ import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
 
-  const {folders} = useNotebook();
+  const {folders, handleFolders} = useNotebook();
 
   const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>("")
@@ -15,6 +15,19 @@ const Folders = () => {
 
   const handleFolderName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(e.target.value)
+  }
+
+  const handleUpdatingFolderName = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && folderName.trim().length > 0) {
+            handleFolders(folderName);
+            setFolderName("");
+            setIsMakingFolder(false)
+        }
+
+        else if (e.key === "Escape") {
+            setFolderName("")
+            setIsMakingFolder(false)
+        }
   }
 
   return (
@@ -30,19 +43,22 @@ const Folders = () => {
         <div className = "w-full flex flex-col justify-center gap-1">
             {folders.map((folder) => {
                         return (
-                            <div className = "flex flex-row gap-1 p-1">
-                                <Folder size = {'20px'}/>
+                            <div className = "flex flex-row gap-2 p-1 items-center text-gray-500">
+                                <Folder size = {'16px'}/>
                                 <h3>{folder.title}</h3>
                             </div>
                         )
             })}
             {isMakingFolder && 
-                <div className = "flex flex-row gap-1 p-1">
-                    <Folder size = {'20px'}/>
+                <div className = "flex flex-row gap-2 p-1 items-center">
+                    <Folder size = {'16px'}/>
                     <input
+                    onKeyDown={handleUpdatingFolderName}
                     onChange={handleFolderName} 
                     value = {folderName}
-                    placeholder='Enter Folder Name'/>
+                    placeholder='Enter Folder Name'
+                    autoFocus = {true}
+                    />
                 </div>
             }
             {(folders.length === 0 && !isMakingFolder) && 
