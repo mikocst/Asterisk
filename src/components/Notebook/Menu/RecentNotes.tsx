@@ -14,7 +14,7 @@ const RecentNotes = () => {
                   return (
                     <div 
                     key = {note.id}
-                    className = "flex flex-col border-b border-gray-300/70 w-full justify-center pb-1">
+                    className = "flex flex-col border-b border-gray-300/70 w-full justify-center pb-1 cursor-pointer">
                        <h3 className = "text-black/50">{note.title}</h3>
                        <div className = "flex flex-row gap-1 text-sm text-black/30">
                         <p>{note.createdAt}</p>

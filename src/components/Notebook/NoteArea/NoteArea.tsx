@@ -3,9 +3,7 @@ import NoteAreaIdle from "./NoteAreaIdle";
 import NoteAreaActive from "./NoteAreaActive";
 
 const NoteArea = () => {
-  const {creatingNote, notes} = useNotebook();
-
-  console.log(notes)
+  const {creatingNote} = useNotebook();
 
   return (
     <div className = "w-full h-full">
