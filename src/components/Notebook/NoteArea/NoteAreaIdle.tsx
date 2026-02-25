@@ -7,7 +7,7 @@ const NoteAreaIdle = () => {
             <div className = "w-12 h-16 bg-gray-200 rounded-md shadow-md absolute bottom-10 rotate-12 left-14"></div>
             <div className = "w-12 h-16 bg-gray-300/60 rounded-md shadow-md"></div>
         </div>
-        <p className = "text-black/40">Create or select a note with Alt + X</p>
+        <p className = "text-black/40">Create a note using Alt + X or select a note.</p>
       </div>
   )
 }
