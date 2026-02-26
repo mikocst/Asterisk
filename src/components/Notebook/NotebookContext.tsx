@@ -23,6 +23,7 @@ export interface NoteBookContextProps {
     handleWriting: () => void
     handleNoteUpdates:(key: keyof DraftNote, value: string) => void
     handleFolders: (newTitle: string) => void
+    handleNoteClick: (id: string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -49,22 +50,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
 
     const handleWriting = useCallback(() => {
-       if (activeNoteId) {
-            setNotes(prevNotes => prevNotes.map((note) => {
-               if (activeNoteId === note.id) {
-                return {
-                    ...note,
-                    title: draft?.title || "",
-                    content: draft?.content || ""
-                }
-               }
-               else {
-                return note
-               }
-            }))
-       }
-       else {
-         if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
+        if (activeNoteId) {
+            setDraft(null)
+        }
+        else {
+             if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
             let generatedId = crypto.randomUUID();
             const finalNote = {
                 id: generatedId,
@@ -76,20 +66,21 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             setDraft(null)
             setCreatingNote(false)
         }
-       }
+        }
+       
     }, [draft])
 
     const handleNoteUpdates = useCallback((key: keyof DraftNote, value: string) => {
        if (activeNoteId) {
+        setDraft(prev => prev ? { ...prev, [key]: value } : null);
             setNotes(prevNotes => prevNotes.map((note) => {
                 if(activeNoteId === note.id) {
                     return {
                         ...note, [key]: value                    
                     }
                 }
-                else {
                     return note
-                }
+                
             }))
        }
 
@@ -114,7 +105,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             }
            })
        }
-    },[]);
+    },[activeNoteId]);
 
     const handleFolders = useCallback((newTitle: string) => {
         let newFolder = {
@@ -126,6 +117,16 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         setFolders(prev => [...prev, newFolder])
     }, [])
+
+    const handleNoteClick = useCallback((id: string) => {
+        const note = notes.find(n => n.id === id);
+
+        if (note){
+            setCreatingNote(false);
+            setActiveNoteId(id);
+            setDraft({...note})
+        }
+        }, [notes])
 
     const value = {
         creatingNote,
@@ -151,7 +152,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         handleWriting,
         handleNoteUpdates,
-        handleFolders
+        handleFolders,
+        handleNoteClick
     }
 
     return (

@@ -1,7 +1,7 @@
 import { useNotebook } from '../NotebookContext';
 
 const NoteText = () => {
-   const { draft, handleNoteUpdates } = useNotebook();
+   const { handleNoteUpdates, draft } = useNotebook();
 
   return (
     <textarea 

@@ -6,20 +6,15 @@ import { useEffect, useRef } from "react";
 import { ArrowLeft } from "feather-icons-react";
 
 const NoteAreaActive = () => {
-  const {notes, handleWriting, draft, handleNoteUpdates, setCreatingNote, activeNoteId, setActiveNoteId} = useNotebook();
+  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, setDraft, setActiveNoteId} = useNotebook();
 
   const draftRef = useRef(handleWriting);
   draftRef.current = handleWriting;
 
-  const selectedNote = notes.find((note) => note.id === activeNoteId);
-  const currentNoteData = selectedNote || draft
-
-  console.log(activeNoteId, notes)
-
   const handleBackClick = () => {
-    
     setCreatingNote(false)
     setActiveNoteId(null)
+    setDraft(null);
   }
 
   useEffect(() => {
@@ -36,14 +31,14 @@ const NoteAreaActive = () => {
         </button>
         <textarea placeholder="New Note"
         className = "resize-none text-xl h-8 w-full"
-        value = {currentNoteData?.title}
+        value = {draft?.title || ""}
         onChange={(e) => handleNoteUpdates('title', e.target.value)}
         />
         <div className = "flex flex-col gap-2 pb-4 border-b border-gray-200">
             <CreatedNoteDate/>
             <SelectingNoteFolder/>
         </div>
-        <NoteText/>
+        <NoteText />
     </div>
   )
 }

@@ -3,12 +3,7 @@ import { useNotebook } from '../NotebookContext'
 
 const RecentNotes = () => {
 
-  const {notes, setActiveNoteId, setCreatingNote} = useNotebook();
-
-  const handleClickNote = (id: string) => {
-      setCreatingNote(false)
-      setActiveNoteId(id)
-  }
+  const {notes, handleNoteClick} = useNotebook();
 
   return (
     <div className = "flex flex-col gap-2">
@@ -17,8 +12,8 @@ const RecentNotes = () => {
               <div className = "bg-gray-200/50 p-2 rounded-sm">
                 {notes.map((note) => {
                   return (
-                    <div 
-                    onClick = {() => handleClickNote(note.id)}
+                    <div
+                    onClick={() => handleNoteClick(note.id)} 
                     key = {note.id}
                     className = "flex flex-col border-b border-gray-300/70 w-full justify-center pb-1 cursor-pointer">
                        <h3 className = "text-black/50">{note.title}</h3>
