@@ -14,7 +14,6 @@ const NoteAreaActive = () => {
   const handleBackClick = () => {
     setCreatingNote(false)
     setActiveNoteId(null)
-    setDraft(null);
   }
 
   useEffect(() => {
