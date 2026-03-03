@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState} from "react";
 import {type Note, type DraftNote, type Folders } from "./types";
 
 interface NotebookProviderProps {
@@ -91,7 +91,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                     {
                         title: "",
                         content: "",
-                        createdAt: new Date().toISOString(),
+                        createdAt: new Date().toLocaleDateString(),
                         folder: "General",
                         [key]: value
                     }
@@ -126,7 +126,31 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             setActiveNoteId(id);
             setDraft({...note})
         }
-        }, [notes])
+        }, [notes]);
+
+    useEffect(() => {
+        console.log('initiating save')
+        if (!activeNoteId) {
+            return
+        }
+
+        let handler = setTimeout(() => {
+                setNotes(prevNotes => {
+                    return(
+                        prevNotes.map((note) => {
+                        if (activeNoteId === note.id) {
+                            return {...note, ...draft}
+                        }
+
+                        else {
+                            return (note)
+                        }
+                    })
+                    )
+                })
+            }, 5000)
+            return (() =>clearTimeout(handler))
+    }, [draft, activeNoteId])
 
     const value = {
         creatingNote,
