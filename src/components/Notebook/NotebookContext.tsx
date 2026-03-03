@@ -62,7 +62,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             }
             setNotes(prev => [...prev, finalNote])
 
-            setActiveNoteId(generatedId)
             setDraft(null)
             setCreatingNote(false)
         }
