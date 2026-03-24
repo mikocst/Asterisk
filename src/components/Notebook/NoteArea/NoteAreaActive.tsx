@@ -3,7 +3,7 @@ import SelectingNoteFolder from "./SelectingNoteFolder";
 import NoteText from "./NoteText";
 import { useNotebook } from "../NotebookContext";
 import { useEffect, useRef } from "react";
-import { ArrowLeft } from "feather-icons-react";
+import { ArrowLeft, Star, Trash } from "feather-icons-react";
 
 const NoteAreaActive = () => {
   const { handleWriting, draft, handleNoteUpdates, setCreatingNote, setDraft, setActiveNoteId} = useNotebook();
@@ -23,11 +23,23 @@ const NoteAreaActive = () => {
   return (
     <div
     className = "h-full w-full flex flex-col gap-2 p-8 justify-start">
-        <button 
-        onClick = {() => handleBackClick()}
-        className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
-          <ArrowLeft className = "text-gray-500"/>
-        </button>
+        <div className = "h-auto w-full flex justify-between items-center">
+          <button 
+            onClick = {() => handleBackClick()}
+            className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
+            <ArrowLeft className = "text-gray-500"/>
+          </button>
+          <div className = "flex flex-row gap-2 items-center">
+            <button 
+              className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
+              <Star className = "text-gray-500"/>
+            </button>
+            <button 
+              className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
+              <Trash className = "text-red-400"/>
+            </button>
+          </div>
+        </div>
         <textarea placeholder="New Note"
         className = "resize-none text-xl h-8 w-full"
         value = {draft?.title || ""}
