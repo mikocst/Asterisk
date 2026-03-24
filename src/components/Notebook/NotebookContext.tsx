@@ -24,6 +24,7 @@ export interface NoteBookContextProps {
     handleNoteUpdates:(key: keyof DraftNote, value: string) => void
     handleFolders: (newTitle: string) => void
     handleNoteClick: (id: string) => void
+    handleDeleteNote: (id: string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -127,6 +128,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         }
         }, [notes]);
 
+    const handleDeleteNote = useCallback((id: string) => {
+            setNotes(prev => prev.filter(note => note.id !== id))
+            if (activeNoteId === id) {
+                setDraft(null)
+                setActiveNoteId(null)
+            }
+    },[activeNoteId])
+
     useEffect(() => {
         console.log('initiating save')
         if (!activeNoteId) {
@@ -176,7 +185,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleWriting,
         handleNoteUpdates,
         handleFolders,
-        handleNoteClick
+        handleNoteClick,
+        handleDeleteNote
     }
 
     return (
