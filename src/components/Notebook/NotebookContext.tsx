@@ -20,15 +20,16 @@ export interface NoteBookContextProps {
     setFolders: (Folder: Folders[]) => void
     isMakingFolder: boolean
     setIsMakingFolder: (making: boolean) => void
+    lastDeletedNote: Note | null
+    setLastDeletedNote: (deletedNote: Note |null) => void
+    showToast: boolean
+    setShowToast: (show: boolean) => void
     handleWriting: () => void
     handleNoteUpdates:(key: keyof DraftNote, value: string) => void
     handleFolders: (newTitle: string) => void
     handleNoteClick: (id: string) => void
     handleDeleteNote: (id: string) => void
-    lastDeletedNote: Note | null
-    setLastDeletedNote: (deletedNote: Note |null) => void
-    showToast: boolean
-    setShowToast: (show: boolean) => void
+    handleUndo: () => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -152,6 +153,15 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     },[activeNoteId, notes]);
 
+    const handleUndo = useCallback(() => {
+        if (lastDeletedNote) {
+            setNotes(prev => [lastDeletedNote, ...prev])
+
+            setShowToast(false)
+            setLastDeletedNote(null)
+        }
+    }, [lastDeletedNote])
+
     useEffect(() => {
         console.log('initiating save')
         if (!activeNoteId) {
@@ -203,6 +213,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleFolders,
         handleNoteClick,
         handleDeleteNote,
+        handleUndo,
 
         lastDeletedNote,
         setLastDeletedNote,
