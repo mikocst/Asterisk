@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { ArrowLeft, Star, Trash } from "feather-icons-react";
 
 const NoteAreaActive = () => {
-  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, setDraft, setActiveNoteId} = useNotebook();
+  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, handleDeleteNote, setActiveNoteId, activeNoteId} = useNotebook();
 
   const draftRef = useRef(handleWriting);
   draftRef.current = handleWriting;
@@ -35,6 +35,11 @@ const NoteAreaActive = () => {
               <Star className = "text-gray-500"/>
             </button>
             <button 
+              onClick={() => {
+                if(activeNoteId) {
+                  handleDeleteNote(activeNoteId)
+              }
+            }}
               className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
               <Trash className = "text-red-400"/>
             </button>

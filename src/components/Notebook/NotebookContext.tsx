@@ -129,12 +129,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         }, [notes]);
 
     const handleDeleteNote = useCallback((id: string) => {
+            setDraft(null)
             setNotes(prev => prev.filter(note => note.id !== id))
             if (activeNoteId === id) {
                 setDraft(null)
                 setActiveNoteId(null)
+                setCreatingNote(false)
             }
-    },[activeNoteId])
+    },[activeNoteId]);
 
     useEffect(() => {
         console.log('initiating save')
