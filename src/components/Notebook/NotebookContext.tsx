@@ -183,7 +183,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                     )
                 })
             }, 5000)
-            return (() =>clearTimeout(handler))
+            return (() => clearTimeout(handler))
     }, [draft, activeNoteId])
 
     const value = {

@@ -13,7 +13,7 @@ const NoteArea = () => {
       {isBusy ? 
         <NoteAreaActive/> : <NoteAreaIdle/> 
       }
-      <div className = "absolute bottom-2 w-auto p-2 shadow-xl rounded-lg left-1/2 -translate-x-1/2 bg-white">
+      <div className = "absolute bottom-2 w-auto p-2 shadow-xl rounded-lg left-1/2 -translate-x-1/2 bg-white border border-black/20">
         <NoteDeletedToast/>
       </div>
     </div>

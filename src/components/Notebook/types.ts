@@ -4,6 +4,7 @@ export interface Note {
     createdAt: string;
     folder: string;
     content: string;
+    deletedAt?: string
 }
 
 export interface DraftNote {
