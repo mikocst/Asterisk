@@ -19,7 +19,7 @@ const RecentNotes = () => {
                        <h3 className = "text-black/50">{note.title}</h3>
                        <div className = "flex flex-row gap-1 text-sm text-black/30">
                         <p>{note.createdAt}:</p>
-                        <p className = "truncate">{note.content}</p>
+                        <p className = "truncate max-w-[17ch]">{note.content}</p>
                        </div>
                     </div>
                   )

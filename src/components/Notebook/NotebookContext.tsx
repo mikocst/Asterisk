@@ -25,6 +25,10 @@ export interface NoteBookContextProps {
     handleFolders: (newTitle: string) => void
     handleNoteClick: (id: string) => void
     handleDeleteNote: (id: string) => void
+    lastDeletedNote: Note | null
+    setLastDeletedNote: (deletedNote: Note |null) => void
+    showToast: boolean
+    setShowToast: (show: boolean) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -49,6 +53,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [draft, setDraft] = useState<DraftNote | null>(null);
     const [folders, setFolders] = useState<Folders[]>([]);
     const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
+    const [lastDeletedNote, setLastDeletedNote] = useState<Note | null>(null)
+    const [showToast, setShowToast] = useState<boolean>(false)
 
     const handleWriting = useCallback(() => {
         if (activeNoteId) {
@@ -130,13 +136,21 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     const handleDeleteNote = useCallback((id: string) => {
             setDraft(null)
+            let trashedNote = notes.find(note => note.id === id)
+            
+            if(trashedNote) {
+                setLastDeletedNote(trashedNote);
+                setShowToast(true);
+            }
+
             setNotes(prev => prev.filter(note => note.id !== id))
             if (activeNoteId === id) {
                 setDraft(null)
                 setActiveNoteId(null)
                 setCreatingNote(false)
             }
-    },[activeNoteId]);
+
+    },[activeNoteId, notes]);
 
     useEffect(() => {
         console.log('initiating save')
@@ -188,7 +202,12 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleNoteUpdates,
         handleFolders,
         handleNoteClick,
-        handleDeleteNote
+        handleDeleteNote,
+
+        lastDeletedNote,
+        setLastDeletedNote,
+        showToast,
+        setShowToast
     }
 
     return (
