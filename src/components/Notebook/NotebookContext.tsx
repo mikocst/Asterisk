@@ -20,8 +20,8 @@ export interface NoteBookContextProps {
     setFolders: (Folder: Folders[]) => void
     isMakingFolder: boolean
     setIsMakingFolder: (making: boolean) => void
-    lastDeletedNote: Note | null
-    setLastDeletedNote: (deletedNote: Note |null) => void
+    deletedNotes: Note[]
+    setDeletedNotes: (deletedNotes: Note[]) => void
     showToast: boolean
     setShowToast: (show: boolean) => void
     handleWriting: () => void
@@ -29,7 +29,7 @@ export interface NoteBookContextProps {
     handleFolders: (newTitle: string) => void
     handleNoteClick: (id: string) => void
     handleDeleteNote: (id: string) => void
-    handleUndo: () => void
+    handleUndo: (id:string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -54,7 +54,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [draft, setDraft] = useState<DraftNote | null>(null);
     const [folders, setFolders] = useState<Folders[]>([]);
     const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
-    const [lastDeletedNote, setLastDeletedNote] = useState<Note | null>(null)
+    const [deletedNotes, setDeletedNotes] = useState<Note[]>([])
     const [showToast, setShowToast] = useState<boolean>(false)
 
     const handleWriting = useCallback(() => {
@@ -140,7 +140,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             let trashedNote = notes.find(note => note.id === id)
             
             if(trashedNote) {
-                setLastDeletedNote(trashedNote);
+                setDeletedNotes(prev => [trashedNote, ...prev]);
                 setShowToast(true);
             }
 
@@ -153,14 +153,25 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     },[activeNoteId, notes]);
 
-    const handleUndo = useCallback(() => {
-        if (lastDeletedNote) {
-            setNotes(prev => [lastDeletedNote, ...prev])
+    const handleUndo = useCallback((id:string) => {
+        const noteToRestore = deletedNotes.find((note) => note.id === id);
 
-            setShowToast(false)
-            setLastDeletedNote(null)
+        if(!noteToRestore) {
+            return
         }
-    }, [lastDeletedNote])
+
+        if (noteToRestore) {
+            setNotes(prev => [noteToRestore, ...prev])
+            setDeletedNotes(prev => prev.filter((note) => 
+                note.id !== noteToRestore.id
+            ))
+        }
+        
+        if (deletedNotes.length === 1) {
+            setShowToast(false)
+        }
+
+    }, [deletedNotes])
 
     useEffect(() => {
         console.log('initiating save')
@@ -215,8 +226,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleDeleteNote,
         handleUndo,
 
-        lastDeletedNote,
-        setLastDeletedNote,
+        deletedNotes,
+        setDeletedNotes,
         showToast,
         setShowToast
     }
