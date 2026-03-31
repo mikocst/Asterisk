@@ -1,17 +1,22 @@
 import { useNotebook } from "../NotebookContext"
 
-const NoteDeletedToast = () => {
+interface ToastDetails {
+  title: string;
+  id: string
+}
 
-  const {lastDeletedNote, handleUndo} = useNotebook();
+const NoteDeletedToast = ({title, id}:ToastDetails) => {
+
+  const { handleUndo} = useNotebook();
 
   return (
     <div className = "flex flex-row gap-4 w-auto items-center">
       <div className = "flex flex-col gap-1">
-        <p className = "font-medium"> Note {lastDeletedNote?.title} moved to trash</p>
+        <p className = "font-medium"> Note {title} moved to trash</p>
         <p className = "text-gray-500 text-md">Dummy date</p>
       </div>
       <button
-        onClick={handleUndo}
+        onClick={() => handleUndo(id)}
         className = "bg-black text-white h-auto p-2 rounded-lg cursor-pointer"
         >
         Undo
