@@ -137,7 +137,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     const handleDeleteNote = useCallback((id: string) => {
             setDraft(null)
+             console.log("Delete triggered for ID:", id);
+            console.log("Current notes in state:", notes);
             let trashedNote = notes.find(note => note.id === id)
+
+            if(!trashedNote) {
+        console.error("FAILED to find note. Check if ID types match (string vs number)");
+        return;
+    }
             
             if(trashedNote) {
                 setDeletedNotes(prev => [trashedNote, ...prev]);
@@ -151,7 +158,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 setCreatingNote(false)
             }
 
-    },[activeNoteId, notes]);
+    },[activeNoteId]);
 
     const handleUndo = useCallback((id:string) => {
         const noteToRestore = deletedNotes.find((note) => note.id === id);

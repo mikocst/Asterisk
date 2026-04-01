@@ -3,30 +3,43 @@ import NoteAreaIdle from "./NoteAreaIdle";
 import NoteAreaActive from "./NoteAreaActive";
 import NoteDeletedToast from "./NoteDeletedToast";
 import { AnimatePresence, motion, time } from "motion/react";
+import { useState } from "react";
 
 const NoteArea = () => {
-  const {creatingNote, activeNoteId, showToast} = useNotebook();
+  const {creatingNote, activeNoteId, deletedNotes} = useNotebook();
 
   const isBusy = creatingNote || activeNoteId !== null;
+  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <div className = "w-full h-full relative bg-black/3">
       {isBusy ? 
         <NoteAreaActive/> : <NoteAreaIdle/> 
       }
-      <AnimatePresence>
-        {showToast &&
-        <motion.div
-          initial = {{opacity: 0, y: 50}}
-          animate = {{opacity: 1, y: 0}}
-          exit = {{opacity: 0, y: 20}}
-          transition = {{duration: 0.2}}
-          className = "absolute bottom-2 w-auto p-2 shadow-xl rounded-lg left-1/2 -translate-x-1/2 bg-white border border-black/20"
-        >
-            <NoteDeletedToast/>
-        </motion.div>
-        }
-      </AnimatePresence>
+      <div 
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)}
+      className="absolute bottom-10 left-1/2 -translate-x-1/2 w-80 h-20 z-50" 
+      >
+        <AnimatePresence>
+          {deletedNotes.map((note, index) => (
+            <motion.div
+              key={note.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: 1,
+                y: isHovered ? index * -70 : index * -8,
+                scale: isHovered ? 1 : 1 - index * 0.05,
+                zIndex: deletedNotes.length - index
+              }}
+              exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.1 } }}
+              className="absolute bottom-0 w-full p-4 bg-white border border-black/10 shadow-2xl rounded-xl"
+            >
+              <NoteDeletedToast title={note.title} id={note.id} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
