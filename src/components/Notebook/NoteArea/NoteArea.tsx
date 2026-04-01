@@ -2,7 +2,7 @@ import { useNotebook } from "../NotebookContext";
 import NoteAreaIdle from "./NoteAreaIdle";
 import NoteAreaActive from "./NoteAreaActive";
 import NoteDeletedToast from "./NoteDeletedToast";
-import { AnimatePresence, motion, time } from "motion/react";
+import { AnimatePresence, easeOut, motion, time } from "motion/react";
 import { useState } from "react";
 
 const NoteArea = () => {
@@ -28,10 +28,11 @@ const NoteArea = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{
                 opacity: 1,
-                y: isHovered ? index * -70 : index * -8,
+                y: isHovered ? index * -100: index * -8,
                 scale: isHovered ? 1 : 1 - index * 0.05,
-                zIndex: deletedNotes.length - index
+                zIndex: deletedNotes.length - index,
               }}
+              transition = {{ease: "easeOut", duration: 0.2}}
               exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.1 } }}
               className="absolute bottom-0 w-full p-4 bg-white border border-black/10 shadow-2xl rounded-xl"
             >
