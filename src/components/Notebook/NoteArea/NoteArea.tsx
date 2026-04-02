@@ -36,7 +36,11 @@ const NoteArea = () => {
               exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.1 } }}
               className="absolute bottom-0 w-full p-4 bg-white border border-black/10 shadow-2xl rounded-xl"
             >
-              <NoteDeletedToast title={note.title} id={note.id} />
+              <NoteDeletedToast
+              title={note.title}
+              id={note.id} 
+              isHovered = {isHovered}
+              />
             </motion.div>
           ))}
         </AnimatePresence>

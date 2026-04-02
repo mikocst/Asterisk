@@ -6,10 +6,10 @@ const RecentNotes = () => {
   const {notes, handleNoteClick} = useNotebook();
 
   return (
-    <div className = "flex flex-col gap-2">
+    <div className = "flex flex-col gap-1">
         <h2 className = "text-lg font-medium text-gray-500">RECENT NOTES</h2>
             {notes.length > 0 ? (
-              <div className = "bg-gray-200/50 p-2 rounded-sm">
+              <div className = "rounded-sm">
                 {notes.map((note) => {
                   return (
                     <div
