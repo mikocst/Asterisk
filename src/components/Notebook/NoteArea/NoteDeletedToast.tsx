@@ -5,19 +5,22 @@ interface ToastDetails {
   title: string;
   id: string
   isHovered: boolean
+  index: number
 }
 
-const NoteDeletedToast = ({title, id, isHovered}:ToastDetails) => {
+const NoteDeletedToast = ({title, id, isHovered, index}:ToastDetails) => {
 
-  const { handleUndo, setShowToast} = useNotebook();
+  const { handleUndo, handleDismissToast} = useNotebook();
+
+  let stagger = 4000 + (index * 100)
 
   useEffect(() => {
     let timer: number | undefined
 
-    if (isHovered === false) {
-      const timer = setTimeout(() => {
-      setShowToast(false)
-    })
+    if (!isHovered) {
+    timer = setTimeout(() => {
+      handleDismissToast(id)
+    },stagger)
     }
 
     return () => clearTimeout(timer)

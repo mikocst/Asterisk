@@ -40,6 +40,7 @@ const NoteArea = () => {
               title={note.title}
               id={note.id} 
               isHovered = {isHovered}
+              index = {index}
               />
             </motion.div>
           ))}
