@@ -30,6 +30,7 @@ export interface NoteBookContextProps {
     handleNoteClick: (id: string) => void
     handleDeleteNote: (id: string) => void
     handleUndo: (id:string) => void
+    handleDismissToast: (id:string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -180,6 +181,12 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     }, [deletedNotes])
 
+    const handleDismissToast = useCallback((id:string) => {
+        setDeletedNotes((prev) => prev.filter((note) => 
+            note.id !== id
+        ))
+    },[])
+
     useEffect(() => {
         console.log('initiating save')
         if (!activeNoteId) {
@@ -232,6 +239,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleNoteClick,
         handleDeleteNote,
         handleUndo,
+        handleDismissToast,
 
         deletedNotes,
         setDeletedNotes,
