@@ -31,6 +31,7 @@ export interface NoteBookContextProps {
     handleDeleteNote: (id: string) => void
     handleUndo: (id:string) => void
     handleDismissToast: (id:string) => void
+    handleNoteFavorite: (id:string) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -55,8 +56,10 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [draft, setDraft] = useState<DraftNote | null>(null);
     const [folders, setFolders] = useState<Folders[]>([]);
     const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
-    const [deletedNotes, setDeletedNotes] = useState<Note[]>([])
-    const [showToast, setShowToast] = useState<boolean>(false)
+    const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
+    const [showToast, setShowToast] = useState<boolean>(false);
+
+    const favoriteNotes = notes.filter((note) => note.isFavorited)
 
     const handleWriting = useCallback(() => {
         if (activeNoteId) {
@@ -187,6 +190,15 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         ))
     },[])
 
+    const handleNoteFavorite = useCallback((id:string) => {
+        setNotes(prev => prev.map((note) => note.id === id ? {...note, isFavorited: !note.isFavorited} : note
+        ))
+
+        if (favoriteNotes.length === 0) {
+            return
+        }
+    }, [])
+
     useEffect(() => {
         console.log('initiating save')
         if (!activeNoteId) {
@@ -240,6 +252,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleDeleteNote,
         handleUndo,
         handleDismissToast,
+        handleNoteFavorite,
 
         deletedNotes,
         setDeletedNotes,

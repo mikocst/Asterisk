@@ -5,6 +5,7 @@ export interface Note {
     folder: string;
     content: string;
     deletedAt?: string
+    isFavorited?: boolean
 }
 
 export interface DraftNote {
