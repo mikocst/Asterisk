@@ -59,8 +59,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
     const [showToast, setShowToast] = useState<boolean>(false);
 
-    const favoriteNotes = notes.filter((note) => note.isFavorited)
-
     const handleWriting = useCallback(() => {
         if (activeNoteId) {
             setDraft(null)
@@ -104,6 +102,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                         content: "",
                         createdAt: new Date().toLocaleDateString(),
                         folder: "General",
+                        isFavorited: false,
                         [key]: value
                     }
                 )
@@ -133,9 +132,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         const note = notes.find(n => n.id === id);
 
         if (note){
+            const {id: noteId, ...rest} = note
+
             setCreatingNote(false);
             setActiveNoteId(id);
-            setDraft({...note})
+            setDraft(rest)
         }
         }, [notes]);
 
@@ -190,10 +191,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const handleNoteFavorite = useCallback((id:string) => {
         setNotes(prev => prev.map((note) => note.id === id ? {...note, isFavorited: !note.isFavorited} : note
         ))
+
+        setDraft(prev => prev ? { ...prev, isFavorited: !prev.isFavorited } : null);
     }, [])
 
     useEffect(() => {
-        console.log('initiating save')
         if (!activeNoteId) {
             return
         }

@@ -5,7 +5,7 @@ export interface Note {
     folder: string;
     content: string;
     deletedAt?: string
-    isFavorited?: boolean
+    isFavorited: boolean
 }
 
 export interface DraftNote {
@@ -13,6 +13,7 @@ export interface DraftNote {
     createdAt: string;
     folder: string;
     content: string;
+    isFavorited: boolean
 }
 
 export interface Folders {

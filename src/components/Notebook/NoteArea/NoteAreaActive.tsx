@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { ArrowLeft, Star, Trash } from "feather-icons-react";
 
 const NoteAreaActive = () => {
-  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, handleDeleteNote, setActiveNoteId, activeNoteId} = useNotebook();
+  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, handleDeleteNote, setActiveNoteId, activeNoteId, handleNoteFavorite} = useNotebook();
 
   const draftRef = useRef(handleWriting);
   draftRef.current = handleWriting;
@@ -31,8 +31,12 @@ const NoteAreaActive = () => {
           </button>
           <div className = "flex flex-row gap-2 items-center">
             <button 
+              onClick = {() => {
+                handleNoteFavorite(activeNoteId || "")
+              }}
               className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
-              <Star className = "text-gray-500"/>
+              <Star className={draft?.isFavorited ? "text-yellow-400" : "text-gray-500"} 
+              fill={draft?.isFavorited ? "currentColor" : "none"}/>
             </button>
             <button 
               onClick={() => {

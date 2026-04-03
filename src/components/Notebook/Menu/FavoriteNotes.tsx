@@ -1,6 +1,10 @@
-import React from 'react'
+import { useNotebook } from "../NotebookContext"
 
 const FavoriteNotes = () => {
+  const {notes} = useNotebook();
+
+  const favoriteNotes = notes.filter((note) => note.isFavorited)
+
   return (
     <div className = "flex flex-col gap-2">
         <h2 className = "text-lg font-medium text-gray-500">FAVORITES</h2>
