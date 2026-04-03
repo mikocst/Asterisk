@@ -165,24 +165,21 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     },[activeNoteId]);
 
     const handleUndo = useCallback((id:string) => {
-        const noteToRestore = deletedNotes.find((note) => note.id === id);
+        setDeletedNotes(prev => {
+            const noteToRestore = prev.find(n => n.id === id)
 
-        if(!noteToRestore) {
-            return
-        }
+            if (noteToRestore) {
+                setNotes(currentNotes => [noteToRestore, ...currentNotes]);
+            }
 
-        if (noteToRestore) {
-            setNotes(prev => [noteToRestore, ...prev])
-            setDeletedNotes(prev => prev.filter((note) => 
-                note.id !== noteToRestore.id
-            ))
-        }
-        
-        if (deletedNotes.length === 1) {
-            setShowToast(false)
-        }
+            if (prev.length === 1) {
+                setShowToast(false)
+            }
 
-    }, [deletedNotes])
+            return prev.filter(n => n.id !== id)
+        })
+
+    }, [])
 
     const handleDismissToast = useCallback((id:string) => {
         setDeletedNotes((prev) => prev.filter((note) => 
@@ -193,10 +190,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const handleNoteFavorite = useCallback((id:string) => {
         setNotes(prev => prev.map((note) => note.id === id ? {...note, isFavorited: !note.isFavorited} : note
         ))
-
-        if (favoriteNotes.length === 0) {
-            return
-        }
     }, [])
 
     useEffect(() => {
