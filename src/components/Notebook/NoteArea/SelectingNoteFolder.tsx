@@ -4,7 +4,7 @@ import { useNotebook } from "../NotebookContext";
 
 const SelectingNoteFolder = () => {
 
-  const {folders, handleFolders, handleNoteUpdates} = useNotebook()
+  const {folders, handleFolders, handleNoteUpdates, draft} = useNotebook()
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
@@ -15,6 +15,8 @@ const SelectingNoteFolder = () => {
   }
 
   const filtered = folders.filter(f => f.title.toLowerCase().includes(query.toLowerCase()));
+  const folderLabel = draft?.folder ? draft.folder : "Select a Folder";
+  
 
   return (
     !isSearching ? (
@@ -24,7 +26,7 @@ const SelectingNoteFolder = () => {
       >
             <div className = "flex flex-row gap-2 items-center">
                 <Folder size={"20px"} className = "text-black/50"/>
-                <p className = "text-black/50">Select a Folder</p>
+                <p className = "text-black/50">{folderLabel}</p>
             </div>
     </div>
     ) : (
@@ -40,7 +42,11 @@ const SelectingNoteFolder = () => {
             {filtered.map((folder, index) =>
             <div
             key = {folder.id}
-            onClick = {() => handleNoteUpdates('folder', folder.title)}
+            onClick = {() => {
+              handleNoteUpdates('folder', folder.title)
+              setIsSearching(false)
+              setQuery("")
+            }}
             onMouseEnter={() => setFocusedIndex(index)}
             className = "cursor-pointer"
             >
