@@ -42,7 +42,9 @@ const Folders = () => {
         <div className = "w-full flex flex-col justify-center gap-1">
             {folders.map((folder) => {
                         return (
-                            <div className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer">
+                            <div 
+                            key={folder.id}
+                            className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer">
                                 <Folder size = {'16px'}/>
                                 <h3>{folder.title}</h3>
                             </div>
