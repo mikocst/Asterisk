@@ -9,12 +9,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.1",
+    "@astrojs/react": "^5.0.3",
     "@fontsource/space-grotesk": "^5.2.10",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
-    "astro": "^6.0.8",
+    "astro": "^6.1.4",
     "feather-icons-react": "^1.0.0",
     "motion": "^12.33.0",
     "react": "^19.2.4",

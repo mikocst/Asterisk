@@ -19,6 +19,4 @@ export interface DraftNote {
 export interface Folders {
     id: string;
     title: string;
-    count: number;
-    content: Note[]
 }

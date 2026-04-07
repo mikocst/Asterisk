@@ -8,7 +8,7 @@ const FavoriteNotes = () => {
   return (
     <div className = "flex flex-col gap-2">
         <h2 className = "text-lg font-medium text-gray-500">FAVORITES</h2>
-        <div className = "w-full flex justify-center">
+        <div className = "w-full flex flex-col justify-center">
             {favoriteNotes.length > 0 ? (
               favoriteNotes.map((favNote) =>
               <div
