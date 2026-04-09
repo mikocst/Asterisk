@@ -16,7 +16,8 @@ const SelectingNoteFolder = () => {
 
   const filtered = folders.filter(f => f.title.toLowerCase().includes(query.toLowerCase()));
   const folderLabel = draft?.folder ? draft.folder : "Select a Folder";
-  
+  const showCreateOption = query.trim().length > 0 && !folders.some(f => f.title.toLowerCase() === query.toLowerCase());
+  const totalOptions = showCreateOption ? [...filtered, "CREATE_NEW"] : filtered;
 
   return (
     !isSearching ? (
@@ -38,22 +39,30 @@ const SelectingNoteFolder = () => {
          onChange = {(e) => setQuery(e.target.value)}
          className = "rounded-md border border-gray-300 px-2"
          />
-         <div className = "absolute top-full left-0 w-[27%] bg-white/95 shadow-lg h-auto p-2 rounded-md">
-            {filtered.map((folder, index) =>
+         <div className = "absolute top-full left-0 w-[19%] bg-white shadow-lg h-auto p-1 rounded-md">
+            {totalOptions.map((option, index) =>{
+             if( typeof option === "string") {
+              return(
+                <div></div>
+              )
+             }
+             return(
             <div
-            key = {folder.id}
+            key = {option.id}
             onClick = {() => {
-              handleNoteUpdates('folder', folder.title)
+              handleNoteUpdates('folder', option.title)
               setIsSearching(false)
               setQuery("")
             }}
             onMouseEnter={() => setFocusedIndex(index)}
             className = "cursor-pointer"
             >
-              <button>
-                {folder.title}
+              <button className = "hover:bg-gray-200/50 rounded-md w-full py-1 px-2 flex items-start">
+                {option.title}
               </button>
-            </div>
+            </div> 
+             )
+            }
             )}
          </div>
       </div>
