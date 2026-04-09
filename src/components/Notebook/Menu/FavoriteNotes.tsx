@@ -24,7 +24,7 @@ const FavoriteNotes = () => {
               </div>
               )
             ):
-            <p className = "text-sm text-gray-400">No Notes Favorited</p>
+            <p className = "text-sm text-gray-400 w-full text-center">No Notes Favorited</p>
             }
         </div>
     </div>
