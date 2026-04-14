@@ -29,6 +29,15 @@ const Folders = () => {
         }
   }
 
+  const handleBlur = () => {
+        if(folderName.trim().length > 0){
+            handleFolders(folderName)
+        }
+
+        setFolderName("")
+        setIsMakingFolder(false)
+  }
+
   return (
     <div className = "flex flex-col gap-2">
         <div className = "flex flex-row items-center justify-between text-gray-500">
@@ -59,6 +68,8 @@ const Folders = () => {
                     value = {folderName}
                     placeholder='Enter Folder Name'
                     autoFocus = {true}
+                    onBlur = {handleBlur}
+                    className = "border border-gray-200 px-2 rounded-md text-gray-500"
                     />
                 </div>
             }
