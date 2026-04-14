@@ -3,6 +3,7 @@ export interface Note {
     title: string;
     createdAt: string;
     folder: string;
+    folderId: string | null
     content: string;
     deletedAt?: string
     isFavorited: boolean
@@ -12,6 +13,7 @@ export interface DraftNote {
     title: string;
     createdAt: string;
     folder: string;
+    folderId: string | null
     content: string;
     isFavorited: boolean
 }

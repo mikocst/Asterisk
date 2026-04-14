@@ -26,7 +26,7 @@ export interface NoteBookContextProps {
     setShowToast: (show: boolean) => void
     handleWriting: () => void
     handleNoteUpdates:(key: keyof DraftNote, value: string) => void
-    handleFolders: (newTitle: string) => void
+    handleFolders: (newTitle: string) => string
     handleNoteClick: (id: string) => void
     handleDeleteNote: (id: string) => void
     handleUndo: (id:string) => void
@@ -102,6 +102,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                         content: "",
                         createdAt: new Date().toLocaleDateString(),
                         folder: "General",
+                        folderId:"1" ,
                         isFavorited: false,
                         [key]: value
                     }
@@ -118,14 +119,17 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     },[activeNoteId]);
 
     const handleFolders = useCallback((newTitle: string) => {
+        let generatedFolderId = crypto.randomUUID();
         let newFolder = {
-            id: crypto.randomUUID(),
+            id: generatedFolderId,
             title: newTitle,
             count: 0,
             content: []
         }
 
         setFolders(prev => [...prev, newFolder])
+
+        return generatedFolderId
     }, [])
 
     const handleNoteClick = useCallback((id: string) => {

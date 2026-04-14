@@ -25,12 +25,14 @@ console.log(focusedIndex)
 
   const handleSelectIndex = (option: string | Folders) => {
       if(typeof option === "string") {
-        handleFolders(query);
+        const freshId = handleFolders(query);
         handleNoteUpdates('folder', query);
+        handleNoteUpdates('folderId', freshId)
       }
 
       else {
         handleNoteUpdates('folder', option.title);
+        handleNoteUpdates('folderId', option.id);
       }
        setIsSearching(false);
        setQuery("");

@@ -4,10 +4,11 @@ import { useNotebook } from '../NotebookContext'
 
 const Folders = () => {
 
-  const {folders, handleFolders, isMakingFolder, setIsMakingFolder} = useNotebook();
+  const {folders, handleFolders, isMakingFolder, setIsMakingFolder, notes, handleNoteClick} = useNotebook();
 
   const [folderName, setFolderName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [openFolderIds, setOpenFolderIds] = useState<string[]>([]);
 
   const isDuplicate = folders.some((folder) => 
     folder.title.toLowerCase() === folderName.trim().toLowerCase()
@@ -60,6 +61,18 @@ const Folders = () => {
         }
   }
 
+  const toggleFolder = (id:string) => {
+       setOpenFolderIds((prev) => {
+            if(prev.includes(id)){
+                return prev.filter(item => item !== id)
+            }
+
+            else {
+                return [...prev, id]
+            }
+       })
+  }
+
   return (
     <div className = "flex flex-col gap-2">
         <div className = "flex flex-row items-center justify-between text-gray-500">
@@ -72,13 +85,42 @@ const Folders = () => {
         </div>
         <div className = "w-full flex flex-col justify-center gap-1">
             {folders.map((folder) => {
-                        return (
+                const isOpen = openFolderIds.includes(folder.id);
+                const folderNotes = notes.filter((note) => 
+                    note.folderId === folder.id
+                )
+
+                console.log(`Folder: ${folder.title}, ID: ${folder.id}, Open: ${isOpen}, Notes Found: ${folderNotes.length}`);
+
+                return (
+                        <div className = "flex flex-col gap-2">
                             <div 
                             key={folder.id}
-                            className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer">
+                            onClick = {() => toggleFolder(folder.id)}
+                            className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer"
+                            >
                                 <Folder size = {'16px'}/>
                                 <h3>{folder.title}</h3>
                             </div>
+                            {isOpen && (
+                            <div className = "flex flex-col gap-2 ml-4">
+                                {folderNotes.map((folderNote) => 
+                                <div
+                                onClick={() => handleNoteClick(folderNote.id)} 
+                                key = {folderNote.id}
+                                className = "flex flex-col border-b border-gray-300/70 w-full justify-center p-1 rounded-md cursor-pointer hover:bg-gray-200"
+                                >
+                                    <h3 className = "text-black/50">{folderNote.title}</h3>
+                                    <div className = "flex flex-row gap-1 text-sm text-black/30">
+                                        <p>{folderNote.createdAt}:</p>
+                                        <p className = "truncate max-w-[17ch]">{folderNote.content}</p>
+                                    </div>
+                                </div>
+                                )
+                                }
+                            </div>
+                            )}
+                          </div>
                         )
             })}
             {isMakingFolder &&

@@ -9,13 +9,14 @@ const RecentNotes = () => {
     <div className = "flex flex-col gap-1">
         <h2 className = "text-lg font-medium text-gray-500">RECENT NOTES</h2>
             {notes.length > 0 ? (
-              <div className = "rounded-sm">
+              <div className = "rounded-sm flex flex-col gap-2">
                 {notes.map((note) => {
                   return (
                     <div
                     onClick={() => handleNoteClick(note.id)} 
                     key = {note.id}
-                    className = "flex flex-col border-b border-gray-300/70 w-full justify-center pb-1 cursor-pointer">
+                    className = "flex flex-col border-b border-gray-300/70 w-full justify-center p-1 rounded-md cursor-pointer hover:bg-gray-200"
+                    >
                        <h3 className = "text-black/50">{note.title}</h3>
                        <div className = "flex flex-row gap-1 text-sm text-black/30">
                         <p>{note.createdAt}:</p>
