@@ -6,21 +6,35 @@ const Folders = () => {
 
   const {folders, handleFolders, isMakingFolder, setIsMakingFolder} = useNotebook();
 
-  const [folderName, setFolderName] = useState<string>("")
+  const [folderName, setFolderName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+
+  const isDuplicate = folders.some((folder) => 
+    folder.title.toLowerCase() === folderName.trim().toLowerCase()
+);
+
+  const errorMessage = "A folder with this name already exists!"
 
   const handleIsMakingFolder = () => {
     setIsMakingFolder(true)
   }
 
   const handleFolderName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null)
     setFolderName(e.target.value)
   }
 
   const handleUpdatingFolderName = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && folderName.trim().length > 0) {
+            if(!isDuplicate) {
             handleFolders(folderName);
             setFolderName("");
             setIsMakingFolder(false)
+            }
+
+            else if(isDuplicate) {
+                setError(errorMessage)
+            }
         }
 
         else if (e.key === "Escape") {
@@ -30,12 +44,20 @@ const Folders = () => {
   }
 
   const handleBlur = () => {
-        if(folderName.trim().length > 0){
+        if(folderName.trim().length > 0 && !isDuplicate){
             handleFolders(folderName)
+            setFolderName("")
+            setIsMakingFolder(false)
         }
 
-        setFolderName("")
-        setIsMakingFolder(false)
+        else if(folderName.trim().length === 0) {
+            setIsMakingFolder(false)
+            setError(null)
+        }
+
+        else {
+            setError(errorMessage)
+        }
   }
 
   return (
@@ -59,8 +81,9 @@ const Folders = () => {
                             </div>
                         )
             })}
-            {isMakingFolder && 
-                <div className = "flex flex-row gap-2 p-1 items-center">
+            {isMakingFolder &&
+            <div className = "flex flex-col gap-1"> 
+                <div className = "flex flex-row gap-2 items-center">
                     <Folder size = {'16px'}/>
                     <input
                     onKeyDown={handleUpdatingFolderName}
@@ -69,9 +92,13 @@ const Folders = () => {
                     placeholder='Enter Folder Name'
                     autoFocus = {true}
                     onBlur = {handleBlur}
-                    className = "border border-gray-200 px-2 rounded-md text-gray-500"
+                    className = {`border px-2 rounded-md text-gray-500 ${error ? 'border-red-500' : 'border-gray-200'}`}
                     />
                 </div>
+                {error && (
+                    <p className = "text-red-500 text-sm">{error}</p>
+                )}
+            </div>
             }
             {(folders.length === 0 && !isMakingFolder) && 
             <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
