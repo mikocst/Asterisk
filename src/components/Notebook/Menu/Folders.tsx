@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Plus, Folder } from 'feather-icons-react'
+import { Plus, Folder, Trash } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
+import { AnimatePresence, motion } from 'motion/react';
 
 const Folders = () => {
 
@@ -8,6 +9,7 @@ const Folders = () => {
 
   const [folderName, setFolderName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [hover, setHover] = useState<string |null>(null);
   const [openFolderIds, setOpenFolderIds] = useState<string[]>([]);
 
   const isDuplicate = folders.some((folder) => 
@@ -23,6 +25,14 @@ const Folders = () => {
   const handleFolderName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)
     setFolderName(e.target.value)
+  }
+
+  const handleMouseEnter = (id: string) => {
+        setHover(id);
+  }
+
+  const handleMouseLeave = () => {
+        setHover(null)
   }
 
   const handleUpdatingFolderName = (e: React.KeyboardEvent) => {
@@ -79,7 +89,7 @@ const Folders = () => {
             <h2 className = "text-lg font-medium text-gray-500">FOLDERS</h2>
             <button
             onClick = {() => handleIsMakingFolder()}
-            className = "cursor-pointer hover:bg-gray-200/50 p-1 rounded-sm">
+            className = "cursor-pointer hover:bg-gray-200/50 px-1 rounded-sm">
                 <Plus size={'20px'}/>
             </button>
         </div>
@@ -90,17 +100,32 @@ const Folders = () => {
                     note.folderId === folder.id
                 )
 
-                console.log(`Folder: ${folder.title}, ID: ${folder.id}, Open: ${isOpen}, Notes Found: ${folderNotes.length}`);
-
                 return (
                         <div className = "flex flex-col gap-2">
                             <div 
                             key={folder.id}
                             onClick = {() => toggleFolder(folder.id)}
-                            className = "flex flex-row gap-2 p-1 items-center text-gray-500 cursor-pointer"
+                            onMouseEnter = {() => handleMouseEnter(folder.id)}
+                            onMouseLeave = {handleMouseLeave}
+                            className = "flex flex-row justify-between p-1 items-center cursor-pointer"
                             >
-                                <Folder size = {'16px'}/>
-                                <h3>{folder.title}</h3>
+                                <div className = "flex flex-row gap-2 items-center text-gray-500">
+                                    <Folder size = {'16px'}/>
+                                    <h3>{folder.title}</h3>
+                                </div>
+                                <AnimatePresence>
+                                    {hover === folder.id && (
+                                    <motion.div
+                                    initial = {{opacity: 0}}
+                                    animate = {{opacity: 1}}
+                                    exit = {{opacity: 0}}
+                                    transition = {{ease: 'easeOut', duration: 0.2}}
+                                    className = "text-red-500 border border-gray-300 rounded-md p-1 hover:bg-gray-300"
+                                    >
+                                        <Trash size = {`16px`}/>
+                                    </motion.div>
+                                )}
+                                </AnimatePresence>
                             </div>
                             {isOpen && (
                             <div className = "flex flex-col gap-2 ml-4">

@@ -32,6 +32,7 @@ export interface NoteBookContextProps {
     handleUndo: (id:string) => void
     handleDismissToast: (id:string) => void
     handleNoteFavorite: (id:string) => void
+    handleDeleteFolder:(folderId:string, e:React.MouseEvent) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -199,6 +200,10 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         setDraft(prev => prev ? { ...prev, isFavorited: !prev.isFavorited } : null);
     }, [])
 
+    const handleDeleteFolder = useCallback((folderId:string, e:React.MouseEvent) => {
+        e.stopPropagation();
+    }, []) 
+
     useEffect(() => {
         if (!activeNoteId) {
             return
@@ -252,6 +257,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleUndo,
         handleDismissToast,
         handleNoteFavorite,
+        handleDeleteFolder,
 
         deletedNotes,
         setDeletedNotes,
