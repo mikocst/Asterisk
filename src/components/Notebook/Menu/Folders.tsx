@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Plus, Folder, Trash } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
 import { AnimatePresence, motion } from 'motion/react';
+import DeleteFolderModal from './DeleteFolderModal';
 
 const Folders = () => {
 
-  const {folders, handleFolders, isMakingFolder, setIsMakingFolder, notes, handleNoteClick} = useNotebook();
+  const {folders, handleFolders, isMakingFolder, setIsMakingFolder, notes, handleNoteClick, handleDeleteFolder} = useNotebook();
 
   const [folderName, setFolderName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +56,8 @@ const Folders = () => {
         }
   }
 
-  const handleFolderDelete = (e:React.MouseEvent, folderId: string) => {
-    e.stopPropagation();
+  const handleDeleteModal = (e:React.MouseEvent, folderId: string) => {
+    e.stopPropagation()
     setFolderToDelete(folderId)
   }
 
@@ -122,6 +123,7 @@ const Folders = () => {
                                 <AnimatePresence>
                                     {hover === folder.id && (
                                     <motion.div
+                                    onClick = {(e) => handleDeleteModal(e, folder.id)}
                                     initial = {{opacity: 0}}
                                     animate = {{opacity: 1}}
                                     exit = {{opacity: 0}}
@@ -177,6 +179,20 @@ const Folders = () => {
             <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
             }
         </div>
+        <AnimatePresence>
+            {folderToDelete && (
+                <DeleteFolderModal
+                isOpen = {true}
+                folderName = {folders.find(f => f.id === folderToDelete)?.title || ""}
+                noteCount = {notes.filter(n => n.folderId === folderToDelete).length}
+                onClose = {() => setFolderToDelete(null)}
+                onConfirm = {() => {
+                    handleDeleteFolder(folderToDelete)
+                    setFolderToDelete(null)
+                }}
+                />
+            )}
+        </AnimatePresence>
     </div>
   )
 }

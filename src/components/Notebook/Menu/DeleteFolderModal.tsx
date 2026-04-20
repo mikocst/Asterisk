@@ -1,5 +1,5 @@
 import { easeOut, motion } from "motion/react"
-import { XCircle } from "feather-icons-react"
+import { X } from "feather-icons-react"
 import { useEffect } from "react"
 
 interface DeleteFolderModalProps {
@@ -42,28 +42,29 @@ const DeleteFolderModal = ({isOpen, onClose, onConfirm, folderName, noteCount}: 
         exit = {{opacity: 0, scale: 0.95}}
         transition = {{ease:easeOut, duration: 0.2}}
         onClick = {(e:React.MouseEvent) => e.stopPropagation()}
-        className = "flex flex-col gap-2 items-center bg-white p-4"
+        className = "flex flex-col gap-2 items-center bg-white p-4 max-w-md w-full rounded-md"
         >
-            <div className = "flex flex-row justify-between items-center">
-                <h2>Are you sure you want to delete <span>{folderName}</span>?</h2>
-                <XCircle 
+            <div className = "flex flex-row justify-between items-center w-full">
+                <h2>Are you sure you want to delete folder<span>{folderName}</span>?</h2>
+                <X
                 onClick = {() => onClose()}
-                size = {`16px`} 
-                className = "text-gray-500"
+                size = {`20px`} 
+                className = "text-gray-500 cursor-pointer border border-gray-300 rounded-sm hover:bg-gray-100 text-lg"
                 />
             </div>
-            <p>{folderName} currently contains {noteCount} notes. By deleting this folder, these notes will also be deleted.</p>
-            <div>
+            <p className = "text-gray-500 text-md">
+                Folder {folderName} currently contains {noteCount} notes. By deleting this folder, these notes will also be deleted.</p>
+            <div className = "w-full flex flex-row gap-2 justify-end">
                 <button
                  onClick = {() => onClose()}
-                 className = "border border-gray-400 text-gray-500 rounded-md"
+                 className = "border border-gray-400 text-gray-500 rounded-md px-2 py-1 cursor-pointer hover:bg-gray-100"
                  >
                     Cancel
                 </button
                  >
                 <button 
                 onClick = {() => onConfirm()}
-                className = "border border-red-500 text-red-500 rounded-md"
+                className = "border border-red-500 text-red-500 rounded-md px-2 py-1 cursor-pointer hover:bg-red-50"
                 >
                     Confirm
                 </button>
