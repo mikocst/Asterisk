@@ -2,7 +2,7 @@ import { useNotebook } from "../NotebookContext";
 import NoteAreaIdle from "./NoteAreaIdle";
 import NoteAreaActive from "./NoteAreaActive";
 import NoteDeletedToast from "./NoteDeletedToast";
-import { AnimatePresence, easeOut, motion, time } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 const NoteArea = () => {

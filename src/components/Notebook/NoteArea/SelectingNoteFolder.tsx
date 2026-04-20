@@ -17,8 +17,6 @@ const SelectingNoteFolder = () => {
   const totalOptions = showCreateOption ? [...filtered, "Create New"] : filtered;
   const selectedOption = totalOptions[focusedIndex];
 
-console.log(focusedIndex)
-
    const handleSelectClick = () => {
     setIsSearching(true)
   }
