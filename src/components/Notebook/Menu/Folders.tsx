@@ -16,7 +16,7 @@ const Folders = () => {
     folder.title.toLowerCase() === folderName.trim().toLowerCase()
 );
 
-  const errorMessage = "A folder with this name already exists!"
+  const errorMessage = "A folder with this name already exists!";
 
   const handleIsMakingFolder = () => {
     setIsMakingFolder(true)
