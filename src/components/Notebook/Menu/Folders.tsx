@@ -3,6 +3,7 @@ import { Plus, Folder, Trash } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
 import { AnimatePresence, motion } from 'motion/react';
 import DeleteFolderModal from './DeleteFolderModal';
+import NoteListDisplay from './NoteListDisplay';
 
 const Folders = () => {
 
@@ -96,7 +97,7 @@ const Folders = () => {
             <h2 className = "text-lg font-medium text-gray-500">FOLDERS</h2>
             <button
             onClick = {() => handleIsMakingFolder()}
-            className = "cursor-pointer hover:bg-gray-200/50 px-1 rounded-sm">
+            className = "cursor-pointer hover:bg-gray-200/50 p-1 rounded-sm">
                 <Plus size={'20px'}/>
             </button>
         </div>
@@ -108,13 +109,13 @@ const Folders = () => {
                 )
 
                 return (
-                        <div className = "flex flex-col gap-2">
+                        <div className = "flex flex-col">
                             <div 
                             key={folder.id}
                             onClick = {() => toggleFolder(folder.id)}
                             onMouseEnter = {() => handleMouseEnter(folder.id)}
                             onMouseLeave = {handleMouseLeave}
-                            className = "flex flex-row justify-between p-1 items-center cursor-pointer"
+                            className = "flex flex-row justify-between p-1 items-center cursor-pointer h-9"
                             >
                                 <div className = "flex flex-row gap-2 items-center text-gray-500">
                                     <Folder size = {'16px'}/>
@@ -136,21 +137,11 @@ const Folders = () => {
                                 </AnimatePresence>
                             </div>
                             {isOpen && (
-                            <div className = "flex flex-col gap-2 ml-4">
-                                {folderNotes.map((folderNote) => 
-                                <div
-                                onClick={() => handleNoteClick(folderNote.id)} 
-                                key = {folderNote.id}
-                                className = "flex flex-col border-b border-gray-300/70 w-full justify-center p-1 rounded-md cursor-pointer hover:bg-gray-200"
-                                >
-                                    <h3 className = "text-black/50">{folderNote.title}</h3>
-                                    <div className = "flex flex-row gap-1 text-sm text-black/30">
-                                        <p>{folderNote.createdAt}:</p>
-                                        <p className = "truncate max-w-[17ch]">{folderNote.content}</p>
-                                    </div>
-                                </div>
-                                )
-                                }
+                            <div className = "flex flex-col ml-4">
+                                <NoteListDisplay
+                                    noteList={folderNotes}
+                                    handleNoteClick={handleNoteClick}
+                                />
                             </div>
                             )}
                           </div>

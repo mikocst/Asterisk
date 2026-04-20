@@ -42,15 +42,17 @@ const DeleteFolderModal = ({isOpen, onClose, onConfirm, folderName, noteCount}: 
         exit = {{opacity: 0, scale: 0.95}}
         transition = {{ease:easeOut, duration: 0.2}}
         onClick = {(e:React.MouseEvent) => e.stopPropagation()}
-        className = "flex flex-col gap-2 items-center bg-white p-4 max-w-md w-full rounded-md"
+        className = "flex flex-col gap-2 items-center bg-white p-4 max-w-md w-full rounded-md relative"
         >
             <div className = "flex flex-row justify-between items-center w-full">
-                <h2>Are you sure you want to delete folder<span>{folderName}</span>?</h2>
-                <X
-                onClick = {() => onClose()}
-                size = {`20px`} 
-                className = "text-gray-500 cursor-pointer border border-gray-300 rounded-sm hover:bg-gray-100 text-lg"
-                />
+                <h2 className = "text-xl">Are you sure you want to delete folder<span>{folderName}</span>?</h2>
+                <div className = "absolute top-2 right-2">
+                    <X
+                    onClick = {() => onClose()}
+                    size = {`20px`} 
+                    className = "text-gray-500 cursor-pointer border border-gray-300 rounded-sm hover:bg-gray-100"
+                    />
+                </div>
             </div>
             <p className = "text-gray-500 text-md">
                 Folder {folderName} currently contains {noteCount} notes. By deleting this folder, these notes will also be deleted.</p>
