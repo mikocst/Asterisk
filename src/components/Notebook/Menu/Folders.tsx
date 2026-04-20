@@ -11,6 +11,7 @@ const Folders = () => {
   const [error, setError] = useState<string | null>(null);
   const [hover, setHover] = useState<string |null>(null);
   const [openFolderIds, setOpenFolderIds] = useState<string[]>([]);
+  const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
 
   const isDuplicate = folders.some((folder) => 
     folder.title.toLowerCase() === folderName.trim().toLowerCase()
@@ -52,6 +53,11 @@ const Folders = () => {
             setFolderName("")
             setIsMakingFolder(false)
         }
+  }
+
+  const handleFolderDelete = (e:React.MouseEvent, folderId: string) => {
+    e.stopPropagation();
+    setFolderToDelete(folderId)
   }
 
   const handleBlur = () => {
