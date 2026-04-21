@@ -6,9 +6,10 @@ interface ToastDetails {
   id: string
   isHovered: boolean
   index: number
+  deletedAt?: string
 }
 
-const NoteDeletedToast = ({title, id, isHovered, index}:ToastDetails) => {
+const NoteDeletedToast = ({title, id, isHovered, index, deletedAt}:ToastDetails) => {
 
   const { handleUndo, handleDismissToast} = useNotebook();
 
@@ -30,7 +31,7 @@ const NoteDeletedToast = ({title, id, isHovered, index}:ToastDetails) => {
     <div className = "flex flex-row justify-between w-auto items-center">
       <div className = "flex flex-col gap-1">
         <p className = "font-medium">{title} moved to trash</p>
-        <p className = "text-gray-500 text-md">Dummy date</p>
+        <p className = "text-gray-500 text-md">{deletedAt}</p>
       </div>
       <button
         onClick={() => handleUndo(id)}

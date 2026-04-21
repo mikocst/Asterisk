@@ -41,6 +41,7 @@ const NoteArea = () => {
               id={note.id} 
               isHovered = {isHovered}
               index = {index}
+              deletedAt = {note.deletedAt}
               />
             </motion.div>
           ))}

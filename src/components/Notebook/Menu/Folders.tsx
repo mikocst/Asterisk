@@ -130,7 +130,7 @@ const Folders = () => {
                                     animate = {{opacity: 1}}
                                     exit = {{opacity: 0}}
                                     transition = {{ease: 'easeOut', duration: 0.2}}
-                                    className = "text-red-500 border border-gray-300 rounded-md p-1 hover:bg-gray-300"
+                                    className = "text-red-500 border border-gray-300 rounded-md p-1 hover:bg-gray-200"
                                     >
                                         <Trash size = {`16px`}/>
                                     </motion.div>

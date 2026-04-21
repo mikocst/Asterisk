@@ -45,12 +45,11 @@ const DeleteFolderModal = ({isOpen, onClose, onConfirm, folderName, noteCount}: 
         className = "flex flex-col gap-2 items-center bg-white p-4 max-w-md w-full rounded-md relative"
         >
             <div className = "flex flex-row justify-between items-center w-full">
-                <h2 className = "text-xl">Are you sure you want to delete folder<span>{folderName}</span>?</h2>
+                <h2 className = "text-xl">Are you sure you want to delete folder <span>{folderName}</span>?</h2>
                 <div className = "absolute top-2 right-2">
                     <X
                     onClick = {() => onClose()}
-                    size = {`20px`} 
-                    className = "text-gray-500 cursor-pointer border border-gray-300 rounded-sm hover:bg-gray-100"
+                    className = "text-gray-500 p-1 cursor-pointer border border-gray-300 rounded-sm hover:bg-gray-100"
                     />
                 </div>
             </div>
@@ -66,7 +65,7 @@ const DeleteFolderModal = ({isOpen, onClose, onConfirm, folderName, noteCount}: 
                  >
                 <button 
                 onClick = {() => onConfirm()}
-                className = "border border-red-500 text-red-500 rounded-md px-2 py-1 cursor-pointer hover:bg-red-50"
+                className = "border border-red-500 text-red-500 rounded-md px-2 py-1 cursor-pointer hover:bg-red-100"
                 >
                     Confirm
                 </button>

@@ -147,8 +147,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     const handleDeleteNote = useCallback((id: string) => {
             setDraft(null)
-             console.log("Delete triggered for ID:", id);
-            console.log("Current notes in state:", notes);
             let trashedNote = notes.find(note => note.id === id)
 
             if(!trashedNote) {
@@ -157,7 +155,12 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }
             
             if(trashedNote) {
-                setDeletedNotes(prev => [trashedNote, ...prev]);
+                const deletedNoteWithTimestamp = {
+                    ...trashedNote,
+                    deletedAt: new Date().toLocaleDateString()
+                }
+
+                setDeletedNotes(prev => [deletedNoteWithTimestamp, ...prev]);
                 setShowToast(true);
             }
 

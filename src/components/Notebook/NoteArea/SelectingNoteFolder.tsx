@@ -1,5 +1,5 @@
-import { Folder } from "feather-icons-react"
-import { useState, useRef, useCallback } from "react"
+import { Folder, Plus } from "feather-icons-react"
+import { useState, useCallback } from "react"
 import { useNotebook } from "../NotebookContext";
 import { type Folders } from "../types";
 
@@ -89,7 +89,7 @@ const SelectingNoteFolder = () => {
               return(
                 <div 
                 key = "Create New"
-                className={`cursor-pointer w-full py-1 px-2 rounded-md ${
+                className={`cursor-pointer w-full py-1 px-2 rounded-md flex flex-row gap-1 items-center  text-gray-600 ${
                 index === focusedIndex ? "bg-gray-200 ring-2 ring-blue-500/50" : "hover:bg-gray-100"
                 }`}
                 onClick={() => {
@@ -97,6 +97,7 @@ const SelectingNoteFolder = () => {
                 }}
                 onMouseEnter={() => setFocusedIndex(index)}
                 >
+                  <Plus size={`16px`}/>
                   <p>Create {query} folder</p>
                 </div>
               )
@@ -108,10 +109,11 @@ const SelectingNoteFolder = () => {
               handleSelectIndex(option)
             }}
             onMouseEnter={() => setFocusedIndex(index)}
-            className={`cursor-pointer w-full py-1 px-2 rounded-md ${
+            className={`cursor-pointer w-full py-1 px-2 rounded-md flex flex-row gap-1 text-gray-600 items-center ${
                       index === focusedIndex ? "bg-gray-200 ring-2 ring-blue-500/50" : "hover:bg-gray-100"
                       }`}
             >
+              <Folder size = {`16px`}/>
                 {option.title}
             </div> 
              )
