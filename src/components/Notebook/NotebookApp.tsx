@@ -4,9 +4,7 @@ import NoteMenu from './Menu/NoteMenu'
 import NoteArea from './NoteArea/NoteArea'
 
 const NotebookApp = () => {
-  const {setCreatingNote, setActiveNoteId, setIsMakingFolder, activeNoteId, creatingNote, handleNoteFavorite, handleDeleteNote, setDraft, draft} = useNotebook();
-
-  console.log(activeNoteId)
+  const {setCreatingNote, setActiveNoteId, setIsMakingFolder, activeNoteId, creatingNote, handleNoteFavorite, handleDeleteNote, setDraft,isSearching, setIsSearching} = useNotebook();
 
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {
@@ -51,6 +49,14 @@ const NotebookApp = () => {
               e.preventDefault();
               document.getElementById('note-body-area')?.focus();
               break;
+
+            case 's':
+              e.preventDefault();
+              if(isSearching) {
+                document.getElementById('folder-select')?.focus()
+              }
+              else {setIsSearching(true)}
+              break;
         }
       }
     }
@@ -58,7 +64,7 @@ const NotebookApp = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown)
 
-  }, [activeNoteId, creatingNote, setCreatingNote, setActiveNoteId, setIsMakingFolder, handleNoteFavorite, handleDeleteNote, setDraft])
+  }, [activeNoteId, creatingNote, setCreatingNote, setActiveNoteId, setIsMakingFolder, handleNoteFavorite, handleDeleteNote, setDraft, isSearching, setIsSearching])
 
   return (
     <div className = "flex flex-row h-full">

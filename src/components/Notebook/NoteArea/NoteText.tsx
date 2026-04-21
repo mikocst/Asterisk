@@ -8,7 +8,9 @@ const NoteText = () => {
     id = "note-body-area"
     value = {draft?.content || ""}
     onChange={(e) => handleNoteUpdates('content', e.target.value)}
-    placeholder='Click or press ALT + W to begin writing or "/" for commands...' className = "resize-none"/>
+    placeholder='Click or press ALT + W to begin writing or "/" for commands...' 
+    className = "resize-none p-2"
+    />
   )
 }
 

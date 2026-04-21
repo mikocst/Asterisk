@@ -22,6 +22,8 @@ export interface NoteBookContextProps {
     setIsMakingFolder: (making: boolean) => void
     deletedNotes: Note[]
     setDeletedNotes: (deletedNotes: Note[]) => void
+    isSearching: boolean
+    setIsSearching: (val: boolean) => void
     showToast: boolean
     setShowToast: (show: boolean) => void
     handleWriting: () => void
@@ -59,6 +61,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [isMakingFolder, setIsMakingFolder] = useState<boolean>(false);
     const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
     const [showToast, setShowToast] = useState<boolean>(false);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     const handleWriting = useCallback(() => {
         if (activeNoteId) {
@@ -258,6 +261,9 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         isMakingFolder,
         setIsMakingFolder,
+
+        isSearching,
+        setIsSearching,
 
         handleWriting,
         handleNoteUpdates,

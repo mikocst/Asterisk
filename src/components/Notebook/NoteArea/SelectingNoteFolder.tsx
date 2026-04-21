@@ -5,9 +5,8 @@ import { type Folders } from "../types";
 
 const SelectingNoteFolder = () => {
 
-  const {folders, handleFolders, handleNoteUpdates, draft} = useNotebook()
+  const {folders, handleFolders, handleNoteUpdates, draft, isSearching, setIsSearching} = useNotebook()
 
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
 
@@ -23,7 +22,8 @@ const SelectingNoteFolder = () => {
 
   const handleSelectIndex = (option: string | Folders) => {
       if(typeof option === "string") {
-        const freshId = handleFolders(query);
+        const refinedName = query.trim();
+        const freshId = handleFolders(refinedName);
         handleNoteUpdates('folder', query);
         handleNoteUpdates('folderId', freshId)
       }
@@ -73,6 +73,7 @@ const SelectingNoteFolder = () => {
       <div className = "relative flex flex-row gap-2">
         <Folder size={"20px"} className = "text-black/50"/>
         <input
+         id = 'folder-select'
          value = {query}
          autoFocus
          onChange = {(e) => {
