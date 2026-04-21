@@ -35,8 +35,8 @@ const NoteAreaActive = () => {
                 handleNoteFavorite(activeNoteId || "")
               }}
               className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
-              <Star className={draft?.isFavorited ? "text-yellow-400" : "text-gray-500"} 
-              fill={draft?.isFavorited ? "currentColor" : "none"}/>
+              <Star className={draft?.isFavorited ? "text-yellow-400" : "text-gray-500 hover:text-yellow-400"} 
+              fill={draft?.isFavorited ? "currentColor" : "none"} size={`20px`}/>
             </button>
             <button 
               onClick={() => {
@@ -45,7 +45,7 @@ const NoteAreaActive = () => {
               }
             }}
               className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
-              <Trash className = "text-red-400"/>
+              <Trash className = "text-gray-500 hover:text-red-400" size={`20px`}/>
             </button>
           </div>
         </div>

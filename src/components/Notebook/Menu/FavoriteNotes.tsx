@@ -1,4 +1,5 @@
 import { useNotebook } from "../NotebookContext"
+import NoteListDisplay from "./NoteListDisplay";
 
 const FavoriteNotes = () => {
   const {notes, handleNoteClick} = useNotebook();
@@ -10,19 +11,10 @@ const FavoriteNotes = () => {
         <h2 className = "text-lg font-medium text-gray-500">FAVORITES</h2>
         <div className = "w-full flex flex-col justify-center">
             {favoriteNotes.length > 0 ? (
-              favoriteNotes.map((favNote) =>
-              <div
-              key = {favNote.id}
-              onClick={() => handleNoteClick(favNote.id)}
-              className = "flex flex-col border-b border-gray-300/70 w-full justify-center pb-1 cursor-pointer"
-              >
-                <h3 className = "text-black/50">{favNote.title}</h3>
-                <div className = "flex flex-row gap-1 text-sm text-black/30">
-                    <p>{favNote.createdAt}:</p>
-                    <p className = "truncate max-w-[17ch]">{favNote.content}</p>
-                </div>
-              </div>
-              )
+              <NoteListDisplay
+              noteList={favoriteNotes}
+              handleNoteClick={handleNoteClick}
+              />
             ):
             <p className = "text-sm text-gray-400 w-full text-center">No Notes Favorited</p>
             }

@@ -109,9 +109,10 @@ const Folders = () => {
                 )
 
                 return (
-                        <div className = "flex flex-col">
+                        <div
+                        key={folder.id}
+                        className = "flex flex-col">
                             <div 
-                            key={folder.id}
                             onClick = {() => toggleFolder(folder.id)}
                             onMouseEnter = {() => handleMouseEnter(folder.id)}
                             onMouseLeave = {handleMouseLeave}
