@@ -4,7 +4,7 @@ import NoteMenu from './Menu/NoteMenu'
 import NoteArea from './NoteArea/NoteArea'
 
 const NotebookApp = () => {
-  const {setCreatingNote, setActiveNoteId, setIsMakingFolder, activeNoteId, creatingNote, handleNoteFavorite, handleDeleteNote, setDraft} = useNotebook();
+  const {setCreatingNote, setActiveNoteId, setIsMakingFolder, activeNoteId, creatingNote, handleNoteFavorite, handleDeleteNote, setDraft, draft} = useNotebook();
 
   console.log(activeNoteId)
 
