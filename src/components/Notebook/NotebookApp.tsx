@@ -52,7 +52,7 @@ const NotebookApp = () => {
 
             case 's':
               e.preventDefault();
-              if(isSearching) {
+              if(isSearching === true) {
                 document.getElementById('folder-select')?.focus()
               }
               else {setIsSearching(true)}
