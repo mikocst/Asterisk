@@ -1,3 +1,4 @@
+import { text } from 'motion/react-m';
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
 
@@ -8,8 +9,8 @@ const NoteText = () => {
    const [menuPosition, setMenuPosition] = useState({top: 0, left: 0});
    const [textBeforeCursor, setTextBeforeCursor] = useState<string | undefined>(undefined)
 
-   const textAreaRef = useRef(null);
-   const caretRef = useRef(null);
+   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+   const caretRef = useRef<HTMLSpanElement>(null);
 
    const handleCaretTracking = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value;
@@ -20,7 +21,29 @@ const NoteText = () => {
         setTextBeforeCursor(value.slice(0, index-1));
       }
 
+      else {
+        setIsMenuOpen(false)
+        setTextBeforeCursor(undefined)
+      }
    }
+   
+   useEffect(() => {
+    if(!textBeforeCursor) {
+      return
+    }
+
+    else{ 
+      if(caretRef.current && textAreaRef.current){
+      const topCoord = caretRef?.current?.offsetTop
+      const leftCoord = caretRef?.current?.offsetLeft
+      const scrollOffset = textAreaRef?.current?.scrollTop
+      const finalTopPosition = topCoord - scrollOffset;
+
+      setIsMenuOpen(true);  
+      setMenuPosition({top: finalTopPosition, left: leftCoord})
+      }
+    }
+   }, [textBeforeCursor])
 
   return (
     <div className = "relative w-full h-full">
