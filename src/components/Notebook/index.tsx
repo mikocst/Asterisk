@@ -1,21 +1,23 @@
-import NotebookApp from "./NotebookApp";
 import NotebookProvider from "./NotebookContext";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import React from "react";
+import NotebookApp from "./NotebookApp"; // Assuming this is your main app component
 
-const index = () => {
+// 1. Initialize OUTSIDE the component
+const convexUrl = import.meta.env.PUBLIC_CONVEX_URL;
 
-  const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL)
+const convex = new ConvexReactClient(convexUrl);
 
+const Index = () => {
   return (
     <React.StrictMode>
-       <ConvexProvider client = {convex}>
+       <ConvexProvider client={convex}>
           <NotebookProvider>
-            <NotebookApp/>
+            <NotebookApp />
           </NotebookProvider>
        </ConvexProvider>
     </React.StrictMode>
-  )
-}
+  );
+};
 
-export default index
+export default Index;
