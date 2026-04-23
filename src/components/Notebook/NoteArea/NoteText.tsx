@@ -13,18 +13,47 @@ const NoteText = () => {
    const caretRef = useRef<HTMLSpanElement>(null);
 
    const handleCaretTracking = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+      const inputType = (e.nativeEvent as InputEvent).inputType
       const value = e.target.value;
       const index = e.target.selectionStart;
       const updatedValue = value[index-1];
-      const charBefore = value[index - 2];
 
-      if(updatedValue === "/" ){
+      if(updatedValue === "/" && inputType === "insertText"){
         setTextBeforeCursor(value.slice(0, index-1));
+      }
+      
+      else if(updatedValue === " " || inputType === "deleteContentBackward"){
+        setIsMenuOpen(false)
+        setTextBeforeCursor(undefined)
       }
 
       else {
+        return
+      }
+   }
+
+   const handleCommand = (symbol: string) => {
+      if(!textAreaRef.current) return
+
+      const textValue = textAreaRef.current.value;
+      const textIndex = textAreaRef.current.selectionStart;
+      
+      if(typeof textIndex === "number"){
+        const beforeSlashText = textValue.slice(0, textIndex - 1);
+        const afterSlashText  = textValue.slice(textIndex);
+        const newContent = beforeSlashText + symbol + afterSlashText
+
+        handleNoteUpdates('content', newContent);
+
+        const newCursorPosition = beforeSlashText.length + symbol.length;
+        setTimeout(() => {
+          if(textAreaRef.current) {
+            textAreaRef.current.focus()
+            textAreaRef.current.setSelectionRange(newCursorPosition, newCursorPosition)
+          }
+        })
+
         setIsMenuOpen(false)
-        setTextBeforeCursor(undefined)
       }
    }
    
@@ -71,6 +100,7 @@ const NoteText = () => {
       {isMenuOpen && (
         <div>
           <TextAreaMenu
+          onSelect = {handleCommand}
           positionTop={menuPosition.top}
           positionLeft={menuPosition.left}
           />
