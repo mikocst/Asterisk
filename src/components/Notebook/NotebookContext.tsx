@@ -97,65 +97,61 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             setDraft(null)
         }
         else {
-             if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
-            let generatedId = crypto.randomUUID();
-            const newNoteId = await createNote({
-                title: draft.title,
-                blocks: [
-                    {
-                        id: generatedId,
-                        type: "p",
-                        content: draft.content
-                    }
-                ]
-            })
+            const hasTitle = draft?.title.trim() !== "";
+            const hasContent = draft?.blocks && draft.blocks[0]?.content.trim() !== "";
 
-            setDraft(null)
-            setCreatingNote(false)
+             if (draft && hasTitle || hasContent) {
+                try {
+                    const newNoteId = await createNote({
+                        title: draft.title,
+                        blocks: draft.blocks,
+                        folder: draft.folder,
+                        folderId: draft.folderId,
+                        isFavorited: false
+                    })
+                     setDraft(null)
+                     setCreatingNote(false)
 
-            setActiveNoteId(newNoteId)
+                }
+                catch (err) {
+                    console.error("Failed to create note:", err)
+                }
+            
          }
         } 
     }, [draft, activeNoteId, createNote])
 
-    const handleNoteUpdates = useCallback((key: keyof DraftNote, value: string) => {
-       if (activeNoteId) {
+    const handleNoteUpdates = useCallback(<K extends keyof DraftNote>(
+    key: K, 
+    value: DraftNote[K]
+) => {
+    if (activeNoteId) {
         setDraft(prev => prev ? { ...prev, [key]: value } : null);
-            setNotes(prevNotes => prevNotes.map((note) => {
-                if(activeNoteId === note._id) {
-                    return {
-                        ...note, [key]: value                    
-                    }
-                }
-                    return note
-                
-            }))
-       }
-
-       else {
-         setDraft((prev) => {
+        
+        setNotes(prevNotes => prevNotes.map((note) => {
+            if (activeNoteId === note._id) {
+                return { ...note, [key]: value };
+            }
+            return note;
+        }));
+    } else {
+        setDraft((prev) => {
             if (!prev) {
-                return (
-                    {
-                        title: "",
-                        content: "",
-                        createdAt: new Date().toLocaleDateString(),
-                        folder: "General",
-                        folderId:"1" ,
-                        isFavorited: false,
-                        [key]: value
-                    }
-                )
+                const newDraft: DraftNote = {
+                    title: "",
+                    blocks: [{ id: crypto.randomUUID(), type: 'p', content: "" }],
+                    createdAt: new Date().toLocaleDateString(),
+                    folder: "General",
+                    folderId: "1",
+                    isFavorited: false,
+                };
+                
+                return { ...newDraft, [key]: value };
             }
-
-            else {
-                return (
-                    {...prev, [key]: value}
-                )
-            }
-           })
-       }
-    },[activeNoteId]);
+            return { ...prev, [key]: value };
+        });
+    }
+}, [activeNoteId]);
 
     const handleFolders = useCallback((newTitle: string) => {
         let generatedFolderId = crypto.randomUUID();
@@ -175,11 +171,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         const note = notes.find(n => n._id === id);
 
         if (note){
-            const {_id: noteId, ...rest} = note
+            const {_id: noteId, _creationTime, ...draftContent} = note
 
             setCreatingNote(false);
             setActiveNoteId(id);
-            setDraft(rest)
+            setDraft(draftContent as DraftNote)
         }
         }, [notes]);
 

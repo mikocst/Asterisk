@@ -3,10 +3,10 @@ import type { Id } from "@convex/_generated/dataModel"
 export interface Note {
     _id: Id<"notes">;
     title: string;
-    createdAt: string;
+    _creationTime: number;
+    blocks: Array<Block>
     folder: string;
     folderId: string | null
-    content: string;
     deletedAt?: string
     isFavorited: boolean
 }
@@ -14,9 +14,9 @@ export interface Note {
 export interface DraftNote {
     title: string;
     createdAt: string;
+    blocks: Array<Block>
     folder: string;
     folderId: string | null
-    content: string;
     isFavorited: boolean
 }
 
@@ -26,3 +26,9 @@ export interface Folders {
 }
 
 export type Blocktype = "p" | "h1" | "h2" | "bullet" | "code"
+
+export interface Block {
+    id: string;
+    type: Blocktype;
+    content:string
+}

@@ -4,7 +4,6 @@ import { mutation, query } from "./_generated/server";
 export const getNotes = query({
   args: {},
   handler: async (ctx) => {
-    // We sort by creation time so the newest notes are usually at the top
     return await ctx.db
       .query("notes")
       .order("desc")
@@ -22,17 +21,14 @@ export const createNote = mutation({
         content: v.string(),
       })
     ),
-    folder: v.optional(v.string()),
-    folderId: v.optional(v.union(v.string(), v.null())),
+    folder: v.string(),
+    folderId: v.union(v.string(), v.null()),
+    isFavorited: v.boolean()
   },
   handler: async (ctx, args) => {
     const noteId = await ctx.db.insert("notes", {
-      title: args.title,
-      blocks: args.blocks,
+      ...args,
       userId: "user_placeholder", 
-      isFavorited: false, 
-      folder: args.folder ?? "General",
-      folderId: args.folderId ?? "1",
       lastModified: Date.now(),
     });
     
