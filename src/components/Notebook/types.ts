@@ -1,5 +1,7 @@
+import type { Id } from "@convex/_generated/dataModel"
+
 export interface Note {
-    id: string;
+    _id: Id<"notes">;
     title: string;
     createdAt: string;
     folder: string;

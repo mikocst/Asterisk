@@ -8,7 +8,11 @@
     "dist"
   ],
   "compilerOptions": {
+    "types": ["astro/client", "node"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "paths": {
+      "@convex/*": ["./convex/*"]
+    },
   }
 }

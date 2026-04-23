@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState} from "react";
 import {type Note, type DraftNote, type Folders, type Blocktype } from "./types";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { type Id } from "../../../convex/_generated/dataModel";
+import { api } from "@convex/_generated/api";
+import type { Id } from "@convex/_generated/dataModel"
 
 interface NotebookProviderProps {
     children: React.ReactNode
@@ -13,8 +13,8 @@ export interface NoteBookContextProps {
     setCreatingNote: (val: boolean) => void
     editingNote: boolean
     setEditingNote: (val: boolean) => void
-    activeNoteId: string | null
-    setActiveNoteId: (id: string | null) => void
+    activeNoteId: Id<"notes"> | null
+    setActiveNoteId: (id: Id<"notes"> | null) => void
     notes: Note[];
     setNotes: (noteList: Note[]) => void;
     draft: DraftNote | null;
@@ -32,12 +32,12 @@ export interface NoteBookContextProps {
     handleWriting: () => void
     handleNoteUpdates:(key: keyof DraftNote, value: string) => void
     handleFolders: (newTitle: string) => string
-    handleNoteClick: (id: string) => void
-    handleDeleteNote: (id: string) => void
-    handleUndo: (id:string) => void
-    handleDismissToast: (id:string) => void
-    handleNoteFavorite: (id:string) => void
+    handleNoteClick: (id: Id<"notes">) => void
+    handleDeleteNote: (id: Id<"notes">) => void
+    handleUndo: (id:Id<"notes">) => void
+    handleDismissToast: (id:Id<"notes">) => void
     handleDeleteFolder:(folderId:string) => void
+    handleNoteFavorite:(id: Id<"notes">) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -57,7 +57,7 @@ export const useNotebook = () => {
 export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [creatingNote, setCreatingNote] = useState<boolean>(false);
     const [editingNote, setEditingNote] = useState<boolean>(false);
-    const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [activeNoteId, setActiveNoteId] = useState<Id<"notes"> | null>(null);
     const [notes, setNotes] = useState<Note[]>([]);
     const [draft, setDraft] = useState<DraftNote | null>(null);
     const [folders, setFolders] = useState<Folders[]>([]);
@@ -68,6 +68,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     const cloudNotes = useQuery(api.notes.getNotes);
     const updateBlocks = useMutation(api.notes.updateNoteBlock);
+    const createNote = useMutation(api.notes.createNote);
 
     const handleBlockUpdate = async(
         noteId: Id<"notes">,
@@ -91,31 +92,37 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         }
     }
 
-    const handleWriting = useCallback(() => {
+    const handleWriting = useCallback(async() => {
         if (activeNoteId) {
             setDraft(null)
         }
         else {
              if (draft && (draft.title.trim() !== "" || draft.content.trim() !== "")) {
             let generatedId = crypto.randomUUID();
-            const finalNote = {
-                id: generatedId,
-                ...draft
-            }
-            setNotes(prev => [...prev, finalNote])
+            const newNoteId = await createNote({
+                title: draft.title,
+                blocks: [
+                    {
+                        id: generatedId,
+                        type: "p",
+                        content: draft.content
+                    }
+                ]
+            })
 
             setDraft(null)
             setCreatingNote(false)
-        }
-        }
-       
-    }, [draft])
+
+            setActiveNoteId(newNoteId)
+         }
+        } 
+    }, [draft, activeNoteId, createNote])
 
     const handleNoteUpdates = useCallback((key: keyof DraftNote, value: string) => {
        if (activeNoteId) {
         setDraft(prev => prev ? { ...prev, [key]: value } : null);
             setNotes(prevNotes => prevNotes.map((note) => {
-                if(activeNoteId === note.id) {
+                if(activeNoteId === note._id) {
                     return {
                         ...note, [key]: value                    
                     }
@@ -164,11 +171,11 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         return generatedFolderId
     }, [])
 
-    const handleNoteClick = useCallback((id: string) => {
-        const note = notes.find(n => n.id === id);
+    const handleNoteClick = useCallback((id: Id<"notes">) => {
+        const note = notes.find(n => n._id === id);
 
         if (note){
-            const {id: noteId, ...rest} = note
+            const {_id: noteId, ...rest} = note
 
             setCreatingNote(false);
             setActiveNoteId(id);
@@ -178,7 +185,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     const handleDeleteNote = useCallback((id: string) => {
             setDraft(null)
-            let trashedNote = notes.find(note => note.id === id)
+            let trashedNote = notes.find(note => note._id === id)
 
             if(!trashedNote) {
         console.error("FAILED to find note. Check if ID types match (string vs number)");
@@ -195,7 +202,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 setShowToast(true);
             }
 
-            setNotes(prev => prev.filter(note => note.id !== id))
+            setNotes(prev => prev.filter(note => note._id !== id))
             if (activeNoteId === id) {
                 setDraft(null)
                 setActiveNoteId(null)
@@ -204,9 +211,9 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
     },[activeNoteId]);
 
-    const handleUndo = useCallback((id:string) => {
+    const handleUndo = useCallback((id:Id<"notes">) => {
         setDeletedNotes(prev => {
-            const noteToRestore = prev.find(n => n.id === id)
+            const noteToRestore = prev.find(n => n._id === id)
 
             if (noteToRestore) {
                 setNotes(currentNotes => [noteToRestore, ...currentNotes]);
@@ -216,19 +223,19 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 setShowToast(false)
             }
 
-            return prev.filter(n => n.id !== id)
+            return prev.filter(n => n._id !== id)
         })
 
     }, [])
 
-    const handleDismissToast = useCallback((id:string) => {
+    const handleDismissToast = useCallback((id:Id<"notes">) => {
         setDeletedNotes((prev) => prev.filter((note) => 
-            note.id !== id
+            note._id !== id
         ))
     },[])
 
-    const handleNoteFavorite = useCallback((id:string) => {
-        setNotes(prev => prev.map((note) => note.id === id ? {...note, isFavorited: !note.isFavorited} : note
+    const handleNoteFavorite = useCallback((id:Id<"notes">) => {
+        setNotes(prev => prev.map((note) => note._id === id ? {...note, isFavorited: !note.isFavorited} : note
         ))
 
         setDraft(prev => prev ? { ...prev, isFavorited: !prev.isFavorited } : null);
@@ -249,12 +256,18 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         if (!activeNoteId) {
             return
         }
+    
+    // useEffect(() => {
+    //     if(cloudNotes) {
+    //         setNotes(cloudNotes as Note[])
+    //     }
+    // })
 
         let handler = setTimeout(() => {
                 setNotes(prevNotes => {
                     return(
                         prevNotes.map((note) => {
-                        if (activeNoteId === note.id) {
+                        if (activeNoteId === note._id) {
                             return {...note, ...draft}
                         }
 

@@ -12,6 +12,10 @@ export default defineSchema({
         content: v.string(),
       })
     ),
+    isFavorited: v.boolean(),
+    folder: v.string(),
+    folderId: v.union(v.string(), v.null()),
+    deletedAt: v.optional(v.string()),
     lastModified: v.number(),
   }).index("by_user", ["userId"]),
 });
