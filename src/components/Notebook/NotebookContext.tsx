@@ -1,5 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState} from "react";
-import {type Note, type DraftNote, type Folders } from "./types";
+import {type Note, type DraftNote, type Folders, type Blocktype } from "./types";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { type Id } from "../../../convex/_generated/dataModel";
 
 interface NotebookProviderProps {
     children: React.ReactNode
@@ -62,6 +65,31 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
     const [showToast, setShowToast] = useState<boolean>(false);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    const cloudNotes = useQuery(api.notes.getNotes);
+    const updateBlocks = useMutation(api.notes.updateNoteBlock);
+
+    const handleBlockUpdate = async(
+        noteId: Id<"notes">,
+        blockId: string,
+        newType: Blocktype
+        ) => {
+        const currentNote = cloudNotes?.find(n => n._id === noteId)
+        if (!currentNote) {
+            return
+        }
+
+        const updatedBlocks = currentNote.blocks.map(block => block.id === blockId ? {...block, type: newType} : block);
+
+        try {
+            await updateBlocks({
+                noteId,
+                blocks: updatedBlocks
+            });
+        } catch(err) {
+            console.error("Failed to sync block type:", err);
+        }
+    }
 
     const handleWriting = useCallback(() => {
         if (activeNoteId) {

@@ -22,3 +22,5 @@ export interface Folders {
     id: string;
     title: string;
 }
+
+export type Blocktype = "p" | "h1" | "h2" | "bullet" | "code"
