@@ -1,6 +1,7 @@
 import { text } from 'motion/react-m';
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
+import TextAreaMenu from './textAreaMenu';
 
 const NoteText = () => {
    const { handleNoteUpdates, draft } = useNotebook();
@@ -37,7 +38,7 @@ const NoteText = () => {
       const topCoord = caretRef?.current?.offsetTop
       const leftCoord = caretRef?.current?.offsetLeft
       const scrollOffset = textAreaRef?.current?.scrollTop
-      const finalTopPosition = topCoord - scrollOffset;
+      const finalTopPosition = topCoord - scrollOffset +25;
 
       setIsMenuOpen(true);  
       setMenuPosition({top: finalTopPosition, left: leftCoord})
@@ -67,6 +68,14 @@ const NoteText = () => {
           /
         </span>
       </div>
+      {isMenuOpen && (
+        <div>
+          <TextAreaMenu
+          positionTop={menuPosition.top}
+          positionLeft={menuPosition.left}
+          />
+        </div>
+      )}
     </div>
   )
 }
