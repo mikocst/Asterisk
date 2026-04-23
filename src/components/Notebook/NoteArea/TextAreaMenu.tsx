@@ -14,9 +14,11 @@ const TextAreaMenu = ({positionTop, positionLeft}: textAreMenuProps) => {
       left: positionLeft,
       zIndex: 50 
     }}
-    className="bg-white shadow-md border rounded-md"
+    className="bg-white shadow-md border border-gray-200 rounded-md"
   >
-    <p className="p-2">H1 - Heading</p>
+    <div className="p-2 hover:bg-gray-100 cursor-pointer">
+        <p>H1 - Heading</p>
+    </div>
   </div>
 )}
   

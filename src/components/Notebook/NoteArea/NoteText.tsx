@@ -1,4 +1,3 @@
-import { text } from 'motion/react-m';
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
 import TextAreaMenu from './textAreaMenu';
@@ -17,8 +16,9 @@ const NoteText = () => {
       const value = e.target.value;
       const index = e.target.selectionStart;
       const updatedValue = value[index-1];
+      const charBefore = value[index - 2];
 
-      if(updatedValue === "/"){
+      if(updatedValue === "/" ){
         setTextBeforeCursor(value.slice(0, index-1));
       }
 
@@ -29,7 +29,7 @@ const NoteText = () => {
    }
    
    useEffect(() => {
-    if(!textBeforeCursor) {
+    if(textBeforeCursor === undefined) {
       return
     }
 
@@ -38,7 +38,7 @@ const NoteText = () => {
       const topCoord = caretRef?.current?.offsetTop
       const leftCoord = caretRef?.current?.offsetLeft
       const scrollOffset = textAreaRef?.current?.scrollTop
-      const finalTopPosition = topCoord - scrollOffset +25;
+      const finalTopPosition = topCoord - scrollOffset + 25;
 
       setIsMenuOpen(true);  
       setMenuPosition({top: finalTopPosition, left: leftCoord})
