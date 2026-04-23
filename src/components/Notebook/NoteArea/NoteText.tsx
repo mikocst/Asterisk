@@ -1,6 +1,6 @@
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
-import TextAreaMenu from './textAreaMenu';
+import TextAreaMenu from './TextAreaMenu';
 
 const NoteText = () => {
    const { handleNoteUpdates, draft } = useNotebook();
