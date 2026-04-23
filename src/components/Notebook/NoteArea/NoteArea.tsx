@@ -24,7 +24,7 @@ const NoteArea = () => {
         <AnimatePresence>
           {deletedNotes.map((note, index) => (
             <motion.div
-              key={note.id}
+              key={note._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{
                 opacity: 1,
@@ -38,7 +38,7 @@ const NoteArea = () => {
             >
               <NoteDeletedToast
               title={note.title}
-              id={note.id} 
+              id={note._id} 
               isHovered = {isHovered}
               index = {index}
               deletedAt = {note.deletedAt}

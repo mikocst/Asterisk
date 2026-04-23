@@ -33,7 +33,7 @@ const NoteText = () => {
    }
 
    const handleCommand = (symbol: string) => {
-      if(!textAreaRef.current) return
+      if(!textAreaRef.current || !draft?.blocks) return
 
       const textValue = textAreaRef.current.value;
       const textIndex = textAreaRef.current.selectionStart;
@@ -43,7 +43,12 @@ const NoteText = () => {
         const afterSlashText  = textValue.slice(textIndex);
         const newContent = beforeSlashText + symbol + afterSlashText
 
-        handleNoteUpdates('content', newContent);
+        const updatedBlocks = [...draft.blocks];
+
+        if (updatedBlocks.length > 0 ) {
+          updatedBlocks[0] = {...updatedBlocks[0], content: newContent};
+          handleNoteUpdates('blocks', updatedBlocks)
+        }
 
         const newCursorPosition = beforeSlashText.length + symbol.length;
         setTimeout(() => {
@@ -79,9 +84,12 @@ const NoteText = () => {
     <div className = "relative w-full h-full">
       <textarea 
       id = "note-body-area"
-      value = {draft?.content || ""}
+      value = {draft?.blocks?.[0]?.content || ""}
       onChange={(e) => {
-        handleNoteUpdates('content', e.target.value)
+        if(draft?.blocks){
+          const updatedBlocks = [...draft.blocks]
+          updatedBlocks[0] = {...updatedBlocks[0], content: e.target.value}
+        }
         handleCaretTracking(e)
       }}
       ref = {textAreaRef}

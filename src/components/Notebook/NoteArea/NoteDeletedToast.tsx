@@ -1,9 +1,10 @@
 import { useNotebook } from "../NotebookContext"
 import { useEffect } from "react";
+import type { Id } from "@convex/_generated/dataModel";
 
 interface ToastDetails {
   title: string;
-  id: string
+  id: Id<"notes">
   isHovered: boolean
   index: number
   deletedAt?: string
@@ -16,7 +17,7 @@ const NoteDeletedToast = ({title, id, isHovered, index, deletedAt}:ToastDetails)
   let stagger = 4000 + (index * 100)
 
   useEffect(() => {
-    let timer: number | undefined
+    let timer: ReturnType<typeof setTimeout> | undefined
 
     if (!isHovered) {
     timer = setTimeout(() => {
@@ -25,7 +26,7 @@ const NoteDeletedToast = ({title, id, isHovered, index, deletedAt}:ToastDetails)
     }
 
     return () => clearTimeout(timer)
-  }, [isHovered])
+  }, [isHovered, handleDismissToast, stagger, id])
 
   return (
     <div className = "flex flex-row justify-between w-auto items-center">

@@ -32,7 +32,9 @@ const NoteAreaActive = () => {
           <div className = "flex flex-row gap-2 items-center">
             <button 
               onClick = {() => {
-                handleNoteFavorite(activeNoteId || "")
+                if(activeNoteId){
+                  handleNoteFavorite(activeNoteId)
+                }
               }}
               className = "mb-2 cursor-pointer w-8 pt-1 pr-1 pb-1">
               <Star className={draft?.isFavorited ? "text-yellow-400" : "text-gray-500 hover:text-yellow-400"} 

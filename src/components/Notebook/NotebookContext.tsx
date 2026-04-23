@@ -30,7 +30,7 @@ export interface NoteBookContextProps {
     showToast: boolean
     setShowToast: (show: boolean) => void
     handleWriting: () => void
-    handleNoteUpdates:(key: keyof DraftNote, value: string) => void
+    handleNoteUpdates: <K extends keyof DraftNote>(key: K, value: DraftNote[K]) => void;
     handleFolders: (newTitle: string) => string
     handleNoteClick: (id: Id<"notes">) => void
     handleDeleteNote: (id: Id<"notes">) => void
@@ -69,6 +69,9 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const cloudNotes = useQuery(api.notes.getNotes);
     const updateBlocks = useMutation(api.notes.updateNoteBlock);
     const createNote = useMutation(api.notes.createNote);
+
+    console.log("Cloud Notes:", cloudNotes?.length);
+console.log("Local State Notes:", notes.length);
 
     const handleBlockUpdate = async(
         noteId: Id<"notes">,
@@ -252,12 +255,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         if (!activeNoteId) {
             return
         }
-    
-    // useEffect(() => {
-    //     if(cloudNotes) {
-    //         setNotes(cloudNotes as Note[])
-    //     }
-    // })
 
         let handler = setTimeout(() => {
                 setNotes(prevNotes => {
@@ -275,7 +272,16 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                 })
             }, 5000)
             return (() => clearTimeout(handler))
-    }, [draft, activeNoteId])
+    }, [draft, activeNoteId]);
+
+     useEffect(() => {
+    console.log("Effect Triggered! cloudNotes is:", cloudNotes);
+
+    if (cloudNotes) {
+        setNotes(cloudNotes as Note[]);
+        console.log("Local state updated with:", cloudNotes.length, "notes");
+    }
+}, [cloudNotes]); // <--- CRITICAL: Is this here?
 
     const value = {
         creatingNote,

@@ -8,7 +8,7 @@ export interface Note {
     folder: string;
     folderId: string | null
     deletedAt?: string
-    isFavorited: boolean
+    isFavorited?: boolean
 }
 
 export interface DraftNote {
@@ -17,7 +17,7 @@ export interface DraftNote {
     blocks: Array<Block>
     folder: string;
     folderId: string | null
-    isFavorited: boolean
+    isFavorited?: boolean
 }
 
 export interface Folders {
@@ -25,7 +25,7 @@ export interface Folders {
     title: string;
 }
 
-export type Blocktype = "p" | "h1" | "h2" | "bullet" | "code"
+export type Blocktype = "p" | "h1" | "h2" | "bullet" | "code" 
 
 export interface Block {
     id: string;
