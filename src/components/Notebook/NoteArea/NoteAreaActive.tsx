@@ -56,6 +56,7 @@ const NoteAreaActive = () => {
         value = {draft?.title || ""}
         onChange={(e) => handleNoteUpdates('title', e.target.value)}
         />
+        <div className="text-xs text-gray-400">Debugging ID: {activeNoteId}</div>
         <div className = "flex flex-col gap-2 pb-4 border-b border-gray-200">
             <CreatedNoteDate/>
             <SelectingNoteFolder/>

@@ -133,35 +133,11 @@ console.log("Local State Notes:", notes.length);
     const handleNoteUpdates = useCallback(<K extends keyof DraftNote>(
     key: K, 
     value: DraftNote[K]
-) => {
-    if (activeNoteId) {
+    ) => {
+        console.log(`Update triggered: ${key} = ${value}`);
         setDraft(prev => prev ? { ...prev, [key]: value } : null);
-        
-        setNotes(prevNotes => prevNotes.map((note) => {
-            if (activeNoteId === note._id) {
-                return { ...note, [key]: value };
-            }
-            return note;
-        }));
-    } else {
-        setDraft((prev) => {
-            if (!prev) {
-                const newDraft: DraftNote = {
-                    title: "",
-                    blocks: [{ id: crypto.randomUUID(), type: 'p', content: "" }],
-                    createdAt: new Date().toLocaleDateString(),
-                    folder: "General",
-                    folderId: "1",
-                    isFavorited: false,
-                };
-                
-                return { ...newDraft, [key]: value };
-            }
-            return { ...prev, [key]: value };
-        });
-    }
-}, [activeNoteId]);
-
+    }, [activeNoteId])
+    
     const handleFolders = useCallback((newTitle: string) => {
         let generatedFolderId = crypto.randomUUID();
         let newFolder = {
@@ -239,12 +215,32 @@ console.log("Local State Notes:", notes.length);
         ))
     },[])
 
-    const handleNoteFavorite = useCallback((id:Id<"notes">) => {
-        setNotes(prev => prev.map((note) => note._id === id ? {...note, isFavorited: !note.isFavorited} : note
-        ))
+    const handleNoteFavorite = useCallback(async(id:Id<"notes">) => {
+        const noteToFavorite = notes.find(n => n._id === id);
+
+        if(!noteToFavorite) return
+        const newStatus = !noteToFavorite.isFavorited;
+
+        setNotes(prev => prev.map ((note) =>
+        note._id === id ? {...note, isFavorited: newStatus} : note))
+
+        if (activeNoteId === id) {
+            setDraft(prev => prev ? {...prev, isFavorited: newStatus} : null)
+        }
+
+        try {
+            await updateBlocks({
+                noteId: id,
+                isFavorited: newStatus,
+                blocks: draft?.blocks || noteToFavorite?.blocks || []
+            });
+        }
+        catch (err) {
+            console.error("Failed to sync favorite status:", err)
+        }
 
         setDraft(prev => prev ? { ...prev, isFavorited: !prev.isFavorited } : null);
-    }, [])
+    }, [notes, draft, activeNoteId, updateBlocks])
 
     const handleDeleteFolder = useCallback((folderId:string) => {
 
@@ -258,34 +254,32 @@ console.log("Local State Notes:", notes.length);
     }, []) 
 
     useEffect(() => {
-        if (!activeNoteId) {
-            return
+    if (!activeNoteId || !draft) return;
+
+    const handler = setTimeout(async () => {
+        try {
+            await updateBlocks({
+                noteId: activeNoteId,
+                blocks: draft.blocks,
+                title: draft.title,
+                isFavorited: draft.isFavorited
+            });
+            
+            setNotes(prev => prev.map(n => n._id === activeNoteId ? { ...n, ...draft } : n));
+            
+        } catch (err) {
+            console.error("Sync failed:", err);
         }
+    }, 1500); 
 
-        let handler = setTimeout(() => {
-                setNotes(prevNotes => {
-                    return(
-                        prevNotes.map((note) => {
-                        if (activeNoteId === note._id) {
-                            return {...note, ...draft}
-                        }
+    return () => clearTimeout(handler);
+}, [draft?.title, JSON.stringify(draft?.blocks), activeNoteId]);
 
-                        else {
-                            return (note)
-                        }
-                    })
-                    )
-                })
-            }, 5000)
-            return (() => clearTimeout(handler))
-    }, [draft, activeNoteId]);
-
-     useEffect(() => {
-
-    if (cloudNotes) {
+    useEffect(() => {
+    if (cloudNotes && !activeNoteId) {
         setNotes(cloudNotes as Note[]);
     }
-}, [cloudNotes]); 
+}, [cloudNotes, activeNoteId]);
 
     const value = {
         creatingNote,

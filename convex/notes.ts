@@ -39,6 +39,8 @@ export const createNote = mutation({
 export const updateNoteBlock = mutation({
   args: {
     noteId: v.id("notes"),
+    title: v.optional(v.string()),
+    isFavorited: v.optional(v.boolean()),
     blocks: v.array(
       v.object({
         id: v.string(),
@@ -48,7 +50,10 @@ export const updateNoteBlock = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const {noteId, ...updates} = args;
+
     await ctx.db.patch(args.noteId, {
+      ...updates,
       blocks: args.blocks,
       lastModified: Date.now(),
     });
