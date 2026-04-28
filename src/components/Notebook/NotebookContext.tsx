@@ -38,6 +38,9 @@ export interface NoteBookContextProps {
     handleDismissToast: (id:Id<"notes">) => void
     handleDeleteFolder:(folderId:string) => void
     handleNoteFavorite:(id: Id<"notes">) => void
+    handleBlockUpdate: (noteId: Id<"notes">,
+        blockId: string,
+        newType: Blocktype) => void
 }
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
@@ -275,13 +278,11 @@ console.log("Local State Notes:", notes.length);
     }, [draft, activeNoteId]);
 
      useEffect(() => {
-    console.log("Effect Triggered! cloudNotes is:", cloudNotes);
 
     if (cloudNotes) {
         setNotes(cloudNotes as Note[]);
-        console.log("Local state updated with:", cloudNotes.length, "notes");
     }
-}, [cloudNotes]); // <--- CRITICAL: Is this here?
+}, [cloudNotes]); 
 
     const value = {
         creatingNote,
@@ -317,6 +318,7 @@ console.log("Local State Notes:", notes.length);
         handleDismissToast,
         handleNoteFavorite,
         handleDeleteFolder,
+        handleBlockUpdate,
 
         deletedNotes,
         setDeletedNotes,

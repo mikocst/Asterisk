@@ -1,9 +1,10 @@
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
 import TextAreaMenu from './TextAreaMenu';
+import type { Blocktype } from '../types';
 
 const NoteText = () => {
-   const { handleNoteUpdates, draft } = useNotebook();
+   const { handleNoteUpdates, draft, handleBlockUpdate, activeNoteId } = useNotebook();
 
    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
    const [menuPosition, setMenuPosition] = useState({top: 0, left: 0});
@@ -32,8 +33,8 @@ const NoteText = () => {
       }
    }
 
-   const handleCommand = (symbol: string) => {
-      if(!textAreaRef.current || !draft?.blocks) return
+   const handleCommand = (commandValue: string) => {
+      if(!activeNoteId || !draft?.blocks || !textAreaRef.current) return
 
       const textValue = textAreaRef.current.value;
       const textIndex = textAreaRef.current.selectionStart;
@@ -41,24 +42,32 @@ const NoteText = () => {
       if(typeof textIndex === "number"){
         const beforeSlashText = textValue.slice(0, textIndex - 1);
         const afterSlashText  = textValue.slice(textIndex);
-        const newContent = beforeSlashText + symbol + afterSlashText
+        const formatTypes = ['h1', 'h2', 'p', 'todo'];
+        const isFormat = formatTypes.includes(commandValue);
+        const symbolToInsert = isFormat ? "" : commandValue;
 
-        const updatedBlocks = [...draft.blocks];
+        const newContent = beforeSlashText + symbolToInsert + afterSlashText
 
-        if (updatedBlocks.length > 0 ) {
-          updatedBlocks[0] = {...updatedBlocks[0], content: newContent};
-          handleNoteUpdates('blocks', updatedBlocks)
+        if(isFormat) {
+          const targetBlockId = draft.blocks[0].id;
+          handleBlockUpdate(activeNoteId, targetBlockId, commandValue as Blocktype)
         }
 
-        const newCursorPosition = beforeSlashText.length + symbol.length;
+        const updatedBlocks = [...draft.blocks];
+        updatedBlocks[0] = {...updatedBlocks[0], content: newContent};
+        handleNoteUpdates('blocks', updatedBlocks);
+
+        const newCursorPosition = beforeSlashText.length + symbolToInsert.length;
+
         setTimeout(() => {
           if(textAreaRef.current) {
-            textAreaRef.current.focus()
+            textAreaRef.current.focus();
             textAreaRef.current.setSelectionRange(newCursorPosition, newCursorPosition)
           }
         })
 
-        setIsMenuOpen(false)
+        setIsMenuOpen(false);
+        setTextBeforeCursor(undefined)
       }
    }
    

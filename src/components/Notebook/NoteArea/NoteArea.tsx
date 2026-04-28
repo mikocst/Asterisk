@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 const NoteArea = () => {
-  const {creatingNote, activeNoteId, deletedNotes} = useNotebook();
+  const {creatingNote, activeNoteId, deletedNotes, handleBlockUpdate} = useNotebook();
 
   const isBusy = creatingNote || activeNoteId !== null;
   const [isHovered, setIsHovered] = useState(false)

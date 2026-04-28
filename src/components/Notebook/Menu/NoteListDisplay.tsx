@@ -19,8 +19,12 @@ const NoteListDisplay = ({noteList, handleNoteClick}: NoteListDisplayProps) => {
                                 >
                                     <h3 className = "text-black/50">{singleNote.title}</h3>
                                     <div className = "flex flex-row gap-1 text-sm text-black/30">
-                                        <p>{singleNote._creationTime}:</p>
-                                        <p className = "truncate max-w-[17ch]">{singleNote.blocks[0]?.content || "No content"}</p>
+                                        <p>{ singleNote._creationTime ? new Date(singleNote._creationTime).toLocaleDateString(undefined, {
+                                            month: "short",
+                                            day: "numeric"
+                                        }) : "Just now"}:
+                                        </p>
+                                        <p className = "truncate max-w-[17ch]">{singleNote.blocks[0]?.content || ""}</p>
                                     </div>
                                 </div>
                                 )}
