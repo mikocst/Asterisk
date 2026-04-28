@@ -11,8 +11,33 @@ interface TextBlockProps {
     onCloseMenu: () => void
 }
 
-const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown}: TextBlockProps) => {
+const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu}: TextBlockProps) => {
   const textBlockRef = useRef<HTMLTextAreaElement>(null);
+  const ghostRef = useRef<HTMLSpanElement>(null);
+
+  const handleTextChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const selectionIndex = e.target.selectionStart;
+    const lastChar = value[selectionIndex - 1];
+
+    onUpdate(index, value);
+
+    if(lastChar === '/') {
+      setTimeout(() => {
+        if(textBlockRef.current) {
+          const {offsetTop, offsetLeft} = textBlockRef.current;
+
+          onTriggerMenu({
+            top: offsetTop + 24,
+            left: offsetLeft + 10
+          })
+        }
+      }, 0)
+    }
+    else {
+      onCloseMenu()
+    }
+  }
 
   useEffect(() => {
     const textBlock = textBlockRef.current;
@@ -36,7 +61,7 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown}: TextBlockP
         <textarea
         ref = {textBlockRef}
         value = {block.content}
-        onChange = {(e) => onUpdate(index,e.target.value)}
+        onChange = {handleTextChange}
         onKeyDown = {(e) => onKeyDown(e, index)}
         rows = {1}
         placeholder = {index === 0 ? "Type '/' for commands..." : ""}

@@ -68,3 +68,5 @@ const NoteText = () => {
         </div>
     );
 };
+
+export default NoteText;
