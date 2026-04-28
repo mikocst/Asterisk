@@ -1,14 +1,16 @@
 import { useNotebook } from '../NotebookContext';
 import { useState, useRef, useEffect } from 'react';
 import TextAreaMenu from './TextAreaMenu';
+import TextBlock from './TextBlock';
 import type { Blocktype } from '../types';
 
 const NoteText = () => {
-   const { handleNoteUpdates, draft, handleBlockUpdate, activeNoteId } = useNotebook();
+   const { handleNoteUpdates, draft, handleBlockUpdate, activeNoteId, handleBlockSplit, handleBlockMerge } = useNotebook();
 
    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
    const [menuPosition, setMenuPosition] = useState({top: 0, left: 0});
-   const [textBeforeCursor, setTextBeforeCursor] = useState<string | undefined>(undefined)
+   const [textBeforeCursor, setTextBeforeCursor] = useState<string | undefined>(undefined);
+   const [focusedIndex, setFocusedIndex] = useState<{index:number; position:number }| null>(null)
 
    const textAreaRef = useRef<HTMLTextAreaElement>(null);
    const caretRef = useRef<HTMLSpanElement>(null);
@@ -70,6 +72,29 @@ const NoteText = () => {
     textArea.setSelectionRange(newPos, newPos);
   }, 0);
 };
+
+const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, index: number) => {
+    const caretPosition = e.currentTarget.selectionStart;
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      handleBlockSplit(index, caretPosition);
+
+      setFocusedIndex({index: index + 1, position: 0});
+    }
+
+    else if(e.key === 'Backspace' && caretPosition === 0 && index > 0) {
+      e.preventDefault();
+
+      const previousBlockContent = draft?.blocks[index - 1].content || "";
+      const endOfPreviousBlock = previousBlockContent.length;
+
+      handleBlockMerge(index)
+
+      setFocusedIndex({index: index - 1, position: endOfPreviousBlock})
+    }
+}
    
    useEffect(() => {
     if(textBeforeCursor === undefined) {
@@ -90,53 +115,29 @@ const NoteText = () => {
    }, [textBeforeCursor])
 
   return (
-    <div className = "relative w-full h-full">
-      <textarea 
-      id = "note-body-area"
-      value = {draft?.blocks?.[0]?.content || ""}
-      onChange={(e) => {
-      const newValue = e.target.value;
-
-      if (draft?.blocks) {
-        const updatedBlocks = [...draft.blocks];
-        updatedBlocks[0] = { 
-          ...updatedBlocks[0], 
-          content: newValue,
-          type: updatedBlocks[0].type 
-        };
-        handleNoteUpdates('blocks', updatedBlocks);
-      }
-
-      handleCaretTracking(e);
-      }}
-      ref = {textAreaRef}
-      placeholder='Click or press ALT + W to begin writing or "/" for commands...' 
-      className={`w-full h-full p-2 resize-none relative z-20 bg-transparent outline-none ${
-        draft?.blocks?.[0]?.type === 'h1' ? 'text-4xl font-bold' : 
-        draft?.blocks?.[0]?.type === 'h2' ? 'text-2xl font-semibold' : 
-        draft?.blocks?.[0]?.type === 'h3' ? 'text-2xl font-semibold' : 
-        'text-base' 
-      }`}
+    <div className="relative w-full h-full mx-auto py-2">
+    {draft?.blocks.map((block, index) => (
+      <TextBlock
+        key={block.id}
+        index={index}
+        block={block}
+        focusedIndex={focusedIndex} 
+        onUpdate={(idx, content) => {
+          const updated = [...draft.blocks];
+          updated[idx] = { ...updated[idx], content };
+          handleNoteUpdates('blocks', updated);
+        }}
+        onKeyDown={handleKeyDown}
       />
-      <div className = "absolute top-0 left-0 opacity-0 w-full h-full p-2 whitespace-pre-wrap wrap-break-word pointer-events-none z-10"
-      >
-        <span>{textBeforeCursor}</span>
-        <span id = "caret-locator"
-        ref={caretRef}
-        >
-          /
-        </span>
-      </div>
-      {isMenuOpen && (
-        <div>
-          <TextAreaMenu
-          onSelect = {handleCommand}
-          positionTop={menuPosition.top}
-          positionLeft={menuPosition.left}
-          />
-        </div>
-      )}
-    </div>
+    ))}
+    {isMenuOpen && (
+      <TextAreaMenu
+        onSelect={handleCommand}
+        positionTop={menuPosition.top}
+        positionLeft={menuPosition.left}
+      />
+    )}
+  </div>
   )
 }
 

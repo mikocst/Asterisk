@@ -40,8 +40,11 @@ export interface NoteBookContextProps {
     handleNoteFavorite:(id: Id<"notes">) => void
     handleBlockUpdate: (noteId: Id<"notes">,
         blockId: string,
-        newType: Blocktype) => void
+        newType: Blocktype) => void,
+    handleBlockSplit: (index: number, caretPosition: number) => void
+    handleBlockMerge: (index: number) => void
 }
+
 
 export const NotebookContext = createContext<NoteBookContextProps | undefined>(undefined);
 
@@ -96,6 +99,53 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         } catch(err) {
             console.error("Failed to sync block type:", err);
         }
+    }
+
+      const handleBlockSplit = (index: number, caretPosition: number) => {
+        if(!draft) return;
+
+        const updatedBlocks = [...draft.blocks];
+        const currentBlock = updatedBlocks[index];
+
+        const textBefore = currentBlock.content.slice(0, caretPosition);
+        const textAfter = currentBlock.content.slice(caretPosition);
+
+        updatedBlocks[index] = {...currentBlock, content: textBefore};
+
+        const newBlock: Block = {
+            id: crypto.randomUUID(),
+            type: 'text',
+            content: textAfter
+        }
+
+        updatedBlocks.splice(index + 1, 0, newBlock);
+
+        handleNoteUpdates('blocks', updatedBlocks)
+    }
+
+    const handleBlockMerge = (index: number) => {
+        if(index <= 0) return;
+
+        setDraft(prev => {
+            if(!prev) return null;
+
+            const updatedBlocks = [...prev.blocks];
+            const currentBlock = updatedBlocks[index];
+            const previousBlock = updatedBlocks[index - 1];
+
+            if(!currentBlock || !previousBlock) return prev;
+            
+            const mergedContent = previousBlock.content + currentBlock.content;
+
+            updatedBlocks[index - 1] = {
+                ...previousBlock,
+                content: mergedContent
+            }
+
+            updatedBlocks.splice(index, 1);
+
+            return {...prev, blocks: updatedBlocks}
+        })
     }
 
     const handleWriting = useCallback(async() => {
@@ -320,6 +370,8 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         handleNoteFavorite,
         handleDeleteFolder,
         handleBlockUpdate,
+        handleBlockSplit,
+        handleBlockMerge,
 
         deletedNotes,
         setDeletedNotes,

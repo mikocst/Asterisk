@@ -19,8 +19,12 @@ const TextAreaMenu = ({positionTop, positionLeft, onSelect}: textAreMenuProps) =
   >
     <p className = "text-xs text-gray-400">Basic Text Blocks</p>
     <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+    onMouseDown = {(e) => {
+      e.preventDefault();
+      onSelect("p")
+    }}
     >
-        <p>Text Block</p>
+        <p className = "pointer-events-none">Text Block</p>
     </div>
     <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
     onMouseDown={(e) => {
