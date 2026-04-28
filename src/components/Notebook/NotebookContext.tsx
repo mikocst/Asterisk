@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {type Note, type DraftNote, type Folders, type Blocktype,type Block } from "./types";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
@@ -39,9 +39,10 @@ export interface NoteBookContextProps {
     handleDeleteFolder:(folderId:string) => void
     handleNoteFavorite:(id: Id<"notes">) => void
     handleBlockUpdate: (noteId: Id<"notes">,
-        blockId: string,
-        newType: Blocktype) => void,
-    handleBlockSplit: (index: number, caretPosition: number) => void
+                        blockId: string,
+                        updates: Partial<Pick<Block, 'content' | 'type'>>) => void
+    handleBlockSplit: (index: number, 
+                       caretPosition: number) => void
     handleBlockMerge: (index: number) => void
 }
 
@@ -79,26 +80,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const handleBlockUpdate = async(
         noteId: Id<"notes">,
         blockId: string,
-        newType: Blocktype
+        updates: Partial<Pick<Block, 'content' | 'type'>>
         ) => {
-        console.log("Context received update:", { blockId, newType });
-        const sourceBlocks = draft?.blocks || cloudNotes?.find(n => n._id === noteId)?.blocks;
+        if (!draft?.blocks) return;
 
-        if(!sourceBlocks) return;
-
-        const updatedBlocks: Block[] = sourceBlocks.map((block) =>
-            block.id === blockId ? ({ ...block, type: newType } as Block) : block as Block
-        );
-        setDraft((prev) => (prev ? {...prev, blocks: updatedBlocks} : null))
-
-        try {
-            await updateBlocks({
-                noteId,
-                blocks: updatedBlocks
-            });
-        } catch(err) {
-            console.error("Failed to sync block type:", err);
-        }
+        const updatedBlocks: Block[] = draft.blocks.map((block) => 
+            block.id === blockId ? { ...block, ...updates } : block
+            );
+        setDraft((prev) => (prev ? { ...prev, blocks: updatedBlocks } : null));
     }
 
       const handleBlockSplit = (index: number, caretPosition: number) => {
@@ -120,7 +109,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
         updatedBlocks.splice(index + 1, 0, newBlock);
 
-        handleNoteUpdates('blocks', updatedBlocks)
+        setDraft(prev => prev ? { ...prev, blocks: updatedBlocks } : null);
     }
 
     const handleBlockMerge = (index: number) => {
@@ -134,7 +123,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             const previousBlock = updatedBlocks[index - 1];
 
             if(!currentBlock || !previousBlock) return prev;
-            
+
             const mergedContent = previousBlock.content + currentBlock.content;
 
             updatedBlocks[index - 1] = {
@@ -278,21 +267,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         setNotes(prev => prev.map ((note) =>
         note._id === id ? {...note, isFavorited: newStatus} : note))
 
-        if (activeNoteId === id) {
-            setDraft(prev => prev ? {...prev, isFavorited: newStatus} : null)
-        }
-
-        try {
-            await updateBlocks({
-                noteId: id,
-                isFavorited: newStatus,
-                blocks: draft?.blocks || noteToFavorite?.blocks || []
-            });
-        }
-        catch (err) {
-            console.error("Failed to sync favorite status:", err)
-        }
-
         setDraft(prev => prev ? { ...prev, isFavorited: !prev.isFavorited } : null);
     }, [notes, draft, activeNoteId, updateBlocks])
 
@@ -327,13 +301,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }, 500); 
 
     return () => clearTimeout(handler);
-}, [draft?.title, activeNoteId]);
+}, [draft?.title, JSON.stringify(draft?.blocks), draft?.isFavorited, activeNoteId]);
 
     useEffect(() => {
     if (cloudNotes && !activeNoteId) {
         setNotes(cloudNotes as Note[]);
     }
 }, [cloudNotes, activeNoteId]);
+
 
     const value = {
         creatingNote,

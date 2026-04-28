@@ -5,8 +5,10 @@ interface TextBlockProps {
     index: number
     focusedIndex: {index: number; position: number} | null
     block: Block
-    onUpdate: (index: number, e: React.ChangeEvent<HTMLTextAreaElement>) => void
+    onUpdate: (index: number, content: string) => void
     onKeyDown:(e:React.KeyboardEvent<HTMLTextAreaElement>, index: number) => void
+    onTriggerMenu: (coords: {top: number, left:number}) => void
+    onCloseMenu: () => void
 }
 
 const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown}: TextBlockProps) => {
@@ -24,7 +26,8 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown}: TextBlockP
   useEffect(() => {
     if(focusedIndex?.index === index && textBlockRef.current){
       textBlockRef.current.focus();
-      textBlockRef.current.setSelectionRange(0,0)
+      const pos = focusedIndex.position ?? 0
+      textBlockRef.current.setSelectionRange(pos, pos)
     }
   },[focusedIndex, index])
 
@@ -33,7 +36,7 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown}: TextBlockP
         <textarea
         ref = {textBlockRef}
         value = {block.content}
-        onChange = {(e) => onUpdate(index,e)}
+        onChange = {(e) => onUpdate(index,e.target.value)}
         onKeyDown = {(e) => onKeyDown(e, index)}
         rows = {1}
         placeholder = {index === 0 ? "Type '/' for commands..." : ""}
