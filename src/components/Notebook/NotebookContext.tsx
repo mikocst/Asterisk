@@ -73,9 +73,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const updateBlocks = useMutation(api.notes.updateNoteBlock);
     const createNote = useMutation(api.notes.createNote);
 
-    console.log("Cloud Notes:", cloudNotes?.length);
-console.log("Local State Notes:", notes.length);
-
     const handleBlockUpdate = async(
         noteId: Id<"notes">,
         blockId: string,
@@ -103,15 +100,15 @@ console.log("Local State Notes:", notes.length);
 
     const handleWriting = useCallback(async() => {
         if (activeNoteId) {
-            setDraft(null)
+            return
         }
-        else {
+        if(creatingNote && draft) {
             const hasTitle = draft?.title.trim() !== "";
             const hasContent = draft?.blocks && draft.blocks[0]?.content.trim() !== "";
 
              if (draft && hasTitle || hasContent) {
                 try {
-                    const newNoteId = await createNote({
+                     await createNote({
                         title: draft.title,
                         blocks: draft.blocks,
                         folder: draft.folder,
@@ -128,16 +125,15 @@ console.log("Local State Notes:", notes.length);
             
          }
         } 
-    }, [draft, activeNoteId, createNote])
+    }, [draft, activeNoteId, createNote, creatingNote])
 
     const handleNoteUpdates = useCallback(<K extends keyof DraftNote>(
     key: K, 
     value: DraftNote[K]
     ) => {
-        console.log(`Update triggered: ${key} = ${value}`);
         setDraft(prev => prev ? { ...prev, [key]: value } : null);
     }, [activeNoteId])
-    
+
     const handleFolders = useCallback((newTitle: string) => {
         let generatedFolderId = crypto.randomUUID();
         let newFolder = {
@@ -153,24 +149,32 @@ console.log("Local State Notes:", notes.length);
     }, [])
 
     const handleNoteClick = useCallback((id: Id<"notes">) => {
-        const note = notes.find(n => n._id === id);
+        const note = cloudNotes?.find(n => n._id === id);
 
         if (note){
-            const {_id: noteId, _creationTime, ...draftContent} = note
-
-            setCreatingNote(false);
+            setCreatingNote(false)
             setActiveNoteId(id);
-            setDraft(draftContent as DraftNote)
+
+            const draftContent : DraftNote = {
+                title: note.title,
+                blocks: note.blocks as Block[],
+                isFavorited: note.isFavorited,
+                folder: note.folder,
+                folderId: note.folderId,
+                createdAt: note._creationTime,
+            }
+            
+            setDraft(draftContent)
         }
-        }, [notes]);
+        }, [cloudNotes]);
 
     const handleDeleteNote = useCallback((id: string) => {
             setDraft(null)
             let trashedNote = notes.find(note => note._id === id)
 
             if(!trashedNote) {
-        console.error("FAILED to find note. Check if ID types match (string vs number)");
-        return;
+            console.error("FAILED to find note. Check if ID types match (string vs number)");
+            return;
     }
             
             if(trashedNote) {
@@ -270,10 +274,10 @@ console.log("Local State Notes:", notes.length);
         } catch (err) {
             console.error("Sync failed:", err);
         }
-    }, 1500); 
+    }, 500); 
 
     return () => clearTimeout(handler);
-}, [draft?.title, JSON.stringify(draft?.blocks), activeNoteId]);
+}, [draft?.title, activeNoteId]);
 
     useEffect(() => {
     if (cloudNotes && !activeNoteId) {

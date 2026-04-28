@@ -14,7 +14,7 @@ const NoteArea = () => {
   return (
     <div className = "w-full h-full relative bg-black/3">
       {isBusy ? 
-        <NoteAreaActive key={activeNoteId || "new-note"}/> : <NoteAreaIdle/> 
+        <NoteAreaActive key={activeNoteId}/> : <NoteAreaIdle/> 
       }
       <div 
       onMouseEnter={() => setIsHovered(true)} 

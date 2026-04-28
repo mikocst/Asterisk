@@ -13,7 +13,7 @@ export interface Note {
 
 export interface DraftNote {
     title: string;
-    createdAt: string;
+    createdAt: number;
     blocks: Array<Block>
     folder: string;
     folderId: string | null
