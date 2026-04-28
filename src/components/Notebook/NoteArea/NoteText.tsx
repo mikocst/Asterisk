@@ -21,6 +21,7 @@ const NoteText = () => {
 
       if(updatedValue === "/" && inputType === "insertText"){
         setTextBeforeCursor(value.slice(0, index-1));
+        setIsMenuOpen(true)
       }
       
       else if(updatedValue === " " || inputType === "deleteContentBackward"){
@@ -33,43 +34,42 @@ const NoteText = () => {
       }
    }
 
-   const handleCommand = (commandValue: string) => {
-      if(!activeNoteId || !draft?.blocks || !textAreaRef.current) return
+ const handleCommand = (commandValue: string) => {
+  if (!activeNoteId || !draft?.blocks || !textAreaRef.current) return;
 
-      const textValue = textAreaRef.current.value;
-      const textIndex = textAreaRef.current.selectionStart;
-      
-      if(typeof textIndex === "number"){
-        const beforeSlashText = textValue.slice(0, textIndex - 1);
-        const afterSlashText  = textValue.slice(textIndex);
-        const formatTypes = ['h1', 'h2', 'p', 'todo'];
-        const isFormat = formatTypes.includes(commandValue);
-        const symbolToInsert = isFormat ? "" : commandValue;
+  const textArea = textAreaRef.current;
+  const textValue = textArea.value;
+  const textIndex = textArea.selectionStart; 
 
-        const newContent = beforeSlashText + symbolToInsert + afterSlashText
+  const formatTypes: Blocktype[] = ['h1', 'h2', 'h3', 'p'];
+  const isFormat = formatTypes.includes(commandValue as Blocktype);
 
-        if(isFormat) {
-          const targetBlockId = draft.blocks[0].id;
-          handleBlockUpdate(activeNoteId, targetBlockId, commandValue as Blocktype)
-        }
+  const slashIndex = textIndex - 1;
+  
+  const beforeSlash = textValue.slice(0, slashIndex);
+  const afterSlash = textValue.slice(textIndex);
 
-        const updatedBlocks = [...draft.blocks];
-        updatedBlocks[0] = {...updatedBlocks[0], content: newContent};
-        handleNoteUpdates('blocks', updatedBlocks);
+  const insertText = isFormat ? "" : commandValue;
+  const newContent = beforeSlash + insertText + afterSlash;
 
-        const newCursorPosition = beforeSlashText.length + symbolToInsert.length;
+  const updatedBlocks = [...draft.blocks];
+  updatedBlocks[0] = {
+    ...updatedBlocks[0],
+    content: newContent,
+    type: isFormat ? (commandValue as Blocktype) : updatedBlocks[0].type
+  };
 
-        setTimeout(() => {
-          if(textAreaRef.current) {
-            textAreaRef.current.focus();
-            textAreaRef.current.setSelectionRange(newCursorPosition, newCursorPosition)
-          }
-        })
+  handleNoteUpdates('blocks', updatedBlocks);
 
-        setIsMenuOpen(false);
-        setTextBeforeCursor(undefined)
-      }
-   }
+  setIsMenuOpen(false);
+  setTextBeforeCursor(undefined);
+
+  setTimeout(() => {
+    textArea.focus();
+    const newPos = slashIndex + insertText.length;
+    textArea.setSelectionRange(newPos, newPos);
+  }, 0);
+};
    
    useEffect(() => {
     if(textBeforeCursor === undefined) {
@@ -95,17 +95,30 @@ const NoteText = () => {
       id = "note-body-area"
       value = {draft?.blocks?.[0]?.content || ""}
       onChange={(e) => {
-        if(draft?.blocks){
-          const updatedBlocks = [...draft.blocks]
-          updatedBlocks[0] = {...updatedBlocks[0], content: e.target.value}
-        }
-        handleCaretTracking(e)
+      const newValue = e.target.value;
+
+      if (draft?.blocks) {
+        const updatedBlocks = [...draft.blocks];
+        updatedBlocks[0] = { 
+          ...updatedBlocks[0], 
+          content: newValue,
+          type: updatedBlocks[0].type 
+        };
+        handleNoteUpdates('blocks', updatedBlocks);
+      }
+
+      handleCaretTracking(e);
       }}
       ref = {textAreaRef}
       placeholder='Click or press ALT + W to begin writing or "/" for commands...' 
-      className = "w-full h-full p-2 resize-none relative z-20"
+      className={`w-full h-full p-2 resize-none relative z-20 bg-transparent outline-none ${
+        draft?.blocks?.[0]?.type === 'h1' ? 'text-4xl font-bold' : 
+        draft?.blocks?.[0]?.type === 'h2' ? 'text-2xl font-semibold' : 
+        draft?.blocks?.[0]?.type === 'h3' ? 'text-2xl font-semibold' : 
+        'text-base' 
+      }`}
       />
-      <div className = "absolute top-0 left-0 opacity-0 w-full h-full p-2 whitespace-pre-wrap wrap-break-word pointer-none z-10"
+      <div className = "absolute top-0 left-0 opacity-0 w-full h-full p-2 whitespace-pre-wrap wrap-break-word pointer-events-none z-10"
       >
         <span>{textBeforeCursor}</span>
         <span id = "caret-locator"

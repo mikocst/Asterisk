@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState} from "react";
-import {type Note, type DraftNote, type Folders, type Blocktype } from "./types";
+import {type Note, type DraftNote, type Folders, type Blocktype,type Block } from "./types";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel"
@@ -81,12 +81,15 @@ console.log("Local State Notes:", notes.length);
         blockId: string,
         newType: Blocktype
         ) => {
-        const currentNote = cloudNotes?.find(n => n._id === noteId)
-        if (!currentNote) {
-            return
-        }
+        console.log("Context received update:", { blockId, newType });
+        const sourceBlocks = draft?.blocks || cloudNotes?.find(n => n._id === noteId)?.blocks;
 
-        const updatedBlocks = currentNote.blocks.map(block => block.id === blockId ? {...block, type: newType} : block);
+        if(!sourceBlocks) return;
+
+        const updatedBlocks: Block[] = sourceBlocks.map((block) =>
+            block.id === blockId ? ({ ...block, type: newType } as Block) : block as Block
+        );
+        setDraft((prev) => (prev ? {...prev, blocks: updatedBlocks} : null))
 
         try {
             await updateBlocks({

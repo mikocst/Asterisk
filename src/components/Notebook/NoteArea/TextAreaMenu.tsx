@@ -18,19 +18,33 @@ const TextAreaMenu = ({positionTop, positionLeft, onSelect}: textAreMenuProps) =
     className="bg-white shadow-md border border-gray-200 rounded-md p-2"
   >
     <p className = "text-xs text-gray-400">Basic Text Blocks</p>
-    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md">
+    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+    >
         <p>Text Block</p>
     </div>
     <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
-    onClick = {() => onSelect("# ")}
+    onMouseDown={(e) => {
+    e.preventDefault();
+    onSelect("h1");
+  }}
     >
-        <p>H1 - Heading</p>
+        <p className = "pointer-events-none">H1 - Heading</p>
     </div>
-    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md">
-        <p>H2 - Heading</p>
+    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+    onMouseDown={(e) => {
+    e.preventDefault();
+    onSelect("h2");
+    }}
+    >
+        <p className = "pointer-events-none">H2 - Heading</p>
     </div>
-    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md">
-        <p>H3 - Heading</p>
+    <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+    onMouseDown={(e) => {
+    e.preventDefault();
+    onSelect("h3");
+    }}
+    >
+        <p className = "pointer-events-none">H3 - Heading</p>
     </div>
     <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md">
         <p>Bulleted List</p>
