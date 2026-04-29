@@ -5,13 +5,14 @@ interface TextBlockProps {
     index: number
     focusedIndex: {index: number; position: number} | null
     block: Block
+    isSelected: boolean
     onUpdate: (index: number, content: string) => void
     onKeyDown:(e:React.KeyboardEvent<HTMLTextAreaElement>, index: number) => void
     onTriggerMenu: (coords: {top: number, left:number}) => void
     onCloseMenu: () => void
 }
 
-const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu}: TextBlockProps) => {
+const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu, isSelected}: TextBlockProps) => {
   const textBlockRef = useRef<HTMLTextAreaElement>(null);
   const ghostRef = useRef<HTMLSpanElement>(null);
 
@@ -57,7 +58,9 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
   },[focusedIndex, index])
 
   return (
-    <div className = "group relative w-full mb-1">
+    <div className={`group relative w-full mb-1 transition-colors duration-150 ${
+            isSelected ? "bg-blue-500/20" : "bg-transparent"
+        }`}>
         <textarea
         ref = {textBlockRef}
         value = {block.content}
