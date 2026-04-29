@@ -27,24 +27,48 @@ const NoteText = () => {
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, index: number) => {
 
-    const caretPosition = e.currentTarget.selectionStart;
-    const isAtStart = caretPosition === 0;
-    const isAtEnd = caretPosition === e.currentTarget.value.length;
-
     if(multiSelectRange){
       if(e.key === 'Backspace'){
         e.preventDefault();
         deleteSelectedBlocks();
         return;
       }
-      setMultiSelectRange(null);
+      setMultiSelectRange(null)
     }
 
-    if((e.metaKey || e.ctrlKey) && e.key === 'a'){
-      if(e.currentTarget.selectionStart === 0 && e.currentTarget.selectionEnd === e.currentTarget.value.length){
-        e.preventDefault();
-        setMultiSelectRange({start: 0, end: draft!.blocks.length -1})
-      }
+    const caretPosition = e.currentTarget.selectionStart;
+    const isAtStart = caretPosition === 0;
+
+    const isAllTextSelected = 
+        e.currentTarget.selectionStart === 0 && 
+        e.currentTarget.selectionEnd === e.currentTarget.value.length &&
+        e.currentTarget.value.length > 0;
+
+    if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
+        if (e.currentTarget.selectionStart === 0 && e.currentTarget.selectionEnd === e.currentTarget.value.length) {
+            e.preventDefault();
+            setMultiSelectRange({ start: 0, end: draft!.blocks.length - 1 });
+            return; 
+        }
+    }
+
+    if(e.key === 'Backspace' && isAllTextSelected){
+      e.preventDefault();
+
+      const updatedBlocks = draft!.blocks.filter((_, i) => i !== index);
+      const finalBlocks = updatedBlocks.length === 0 
+            ? [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }] 
+            : updatedBlocks;
+
+      handleNoteUpdates('blocks', finalBlocks);
+
+      const newIndex = Math.max(0, index - 1);
+      setFocusedIndex({ 
+            index: newIndex, 
+            position: draft!.blocks[newIndex].content.length 
+        });
+
+      return;
     }
 
     if (e.key === 'Enter') {
@@ -55,8 +79,13 @@ const NoteText = () => {
     else if (e.key === 'Backspace' && isAtStart && index > 0 ) {
         e.preventDefault();
         const previousBlockContent = draft?.blocks[index - 1].content || "";
+
         handleBlockMerge(index);
-        setFocusedIndex({ index: index - 1, position: previousBlockContent.length });
+
+        setFocusedIndex({
+          index: index - 1,
+          position: previousBlockContent.length
+        })
     }
 };
 
@@ -67,15 +96,21 @@ const deleteSelectedBlocks = () => {
   const min = Math.min(start,end);
   const max = Math.max(start,end);
 
-  const updatedBlocks = draft.blocks.filter((_,i) => i < min || i > max);
+  let updatedBlocks = draft.blocks.filter((_,i) => i < min || i > max);
 
-  if(updatedBlocks.length === 0) {
-    updatedBlocks.push({id:crypto.randomUUID(), type: 'text', content: ''})
+  const finalBlocks = updatedBlocks.length === 0 ? 
+                      [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }]
+                        : updatedBlocks;
+
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
   }
 
-  handleNoteUpdates('blocks', updatedBlocks);
+  handleNoteUpdates('blocks', finalBlocks);
   setMultiSelectRange(null);
-  setFocusedIndex({index: Math.max(0, min-1), position: 0})
+  setTimeout(() => {
+     setFocusedIndex({ index: 0, position: 0 });
+  }, 10);
 }
 
     return (
