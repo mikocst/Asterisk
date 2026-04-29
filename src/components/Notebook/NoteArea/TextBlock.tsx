@@ -10,9 +10,12 @@ interface TextBlockProps {
     onKeyDown:(e:React.KeyboardEvent<HTMLTextAreaElement>, index: number) => void
     onTriggerMenu: (coords: {top: number, left:number}) => void
     onCloseMenu: () => void
+    onMouseDown: (e:React.MouseEvent, index: number) => void
+    onMouseEnter: () => void
+    isDragging: boolean
 }
 
-const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu, isSelected}: TextBlockProps) => {
+const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu, isSelected, onMouseDown, onMouseEnter, isDragging}: TextBlockProps) => {
   const textBlockRef = useRef<HTMLTextAreaElement>(null);
   const ghostRef = useRef<HTMLSpanElement>(null);
 
@@ -58,9 +61,19 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
   },[focusedIndex, index])
 
   return (
-    <div className={`group relative w-full mb-1 transition-colors duration-150 ${
+    <div className={`group relative w-full pb-1 transition-colors duration-150 ${
             isSelected ? "bg-blue-500/20" : "bg-transparent"
-        }`}>
+        }`}
+        data-block-id = {block.id}
+        onMouseDown={(e) => {
+          if (e.shiftKey || e.target === e.currentTarget) {
+                onMouseDown(e, index);
+          }
+        }}
+        onMouseEnter = {() => {
+          if(isDragging) onMouseEnter();
+        }}
+        >
         <textarea
         ref = {textBlockRef}
         value = {block.content}
@@ -68,12 +81,14 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
         onKeyDown = {(e) => onKeyDown(e, index)}
         rows = {1}
         placeholder = {index === 0 ? "Type '/' for commands..." : ""}
-        className={`w-full p-1 resize-none bg-transparent outline-none overflow-hidden transition-all duration-75 ${
-                    block.type === 'h1' ? 'text-4xl font-bold' : 
-                    block.type === 'h2' ? 'text-3xl font-semibold' : 
-                    block.type === 'h3' ? 'text-2xl font-semibold' : 
-                    'text-sm'
-                }`}
+        className={`w-full p-1 resize-none bg-transparent outline-none overflow-hidden transition-all duration-75 
+          ${isDragging ? 'pointer-events-none' : ''} 
+          ${
+              block.type === 'h1' ? 'text-4xl font-bold' : 
+              block.type === 'h2' ? 'text-3xl font-semibold' : 
+              block.type === 'h3' ? 'text-2xl font-semibold' : 
+              'text-sm'
+          }`}
         />
     </div>
   )

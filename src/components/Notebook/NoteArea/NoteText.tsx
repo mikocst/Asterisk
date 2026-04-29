@@ -6,9 +6,11 @@ import type { Blocktype } from '../types';
 
 const NoteText = () => {
     const { draft, activeNoteId, handleBlockUpdate, handleBlockSplit, handleBlockMerge, handleNoteUpdates } = useNotebook();
+
     const [menuState, setMenuState] = useState<{ index: number; top: number; left: number } | null>(null);
     const [focusedIndex, setFocusedIndex] = useState<{ index: number; position: number } | null>(null);
-    const [multiSelectRange, setMultiSelectRange] = useState<{start: number; end: number} | null>(null)
+    const [multiSelectRange, setMultiSelectRange] = useState<{start: number; end: number} | null>(null);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
 
     const handleCommand = (commandValue: string) => {
         if (!activeNoteId || !draft?.blocks || !menuState) return;
@@ -26,95 +28,102 @@ const NoteText = () => {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, index: number) => {
+    const { selectionStart, selectionEnd } = e.currentTarget;
 
-    if(multiSelectRange){
-      if(e.key === 'Backspace'){
-        e.preventDefault();
-        deleteSelectedBlocks();
-        return;
-      }
-      setMultiSelectRange(null)
-    }
-
-    const caretPosition = e.currentTarget.selectionStart;
-    const isAtStart = caretPosition === 0;
-
-    const isAllTextSelected = 
-        e.currentTarget.selectionStart === 0 && 
-        e.currentTarget.selectionEnd === e.currentTarget.value.length &&
-        e.currentTarget.value.length > 0;
-
-    if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
-        if (e.currentTarget.selectionStart === 0 && e.currentTarget.selectionEnd === e.currentTarget.value.length) {
+    if (multiSelectRange) {
+        if (e.key === 'Backspace') {
             e.preventDefault();
-            setMultiSelectRange({ start: 0, end: draft!.blocks.length - 1 });
-            return; 
+            deleteSelectedBlocks();
+            return;
+        }
+        
+        if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Meta') {
+            setMultiSelectRange(null);
         }
     }
 
-    if(e.key === 'Backspace' && isAllTextSelected){
-      e.preventDefault();
-
-      const updatedBlocks = draft!.blocks.filter((_, i) => i !== index);
-      const finalBlocks = updatedBlocks.length === 0 
-            ? [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }] 
-            : updatedBlocks;
-
-      handleNoteUpdates('blocks', finalBlocks);
-
-      const newIndex = Math.max(0, index - 1);
-      setFocusedIndex({ 
-            index: newIndex, 
-            position: draft!.blocks[newIndex].content.length 
+    if (e.key === 'Backspace' && selectionStart === 0 && selectionEnd === 0 && index > 0) {
+        e.preventDefault();
+        const previousContent = draft?.blocks[index - 1].content || "";
+        handleBlockMerge(index);
+        setFocusedIndex({
+            index: index - 1,
+            position: previousContent.length
         });
-
-      return;
+        return;
     }
 
     if (e.key === 'Enter') {
         e.preventDefault();
-        handleBlockSplit(index, caretPosition);
+        handleBlockSplit(index, selectionStart);
         setFocusedIndex({ index: index + 1, position: 0 });
-    } 
-    else if (e.key === 'Backspace' && isAtStart && index > 0 ) {
-        e.preventDefault();
-        const previousBlockContent = draft?.blocks[index - 1].content || "";
-
-        handleBlockMerge(index);
-
-        setFocusedIndex({
-          index: index - 1,
-          position: previousBlockContent.length
-        })
     }
 };
 
-const deleteSelectedBlocks = () => {
-  if (!multiSelectRange || !activeNoteId || !draft) return;
+    const deleteSelectedBlocks = () => {
+      if (!multiSelectRange || !activeNoteId || !draft) return;
 
-  const {start, end } = multiSelectRange;
-  const min = Math.min(start,end);
-  const max = Math.max(start,end);
+      const {start, end } = multiSelectRange;
+      const min = Math.min(start,end);
+      const max = Math.max(start,end);
 
-  let updatedBlocks = draft.blocks.filter((_,i) => i < min || i > max);
+      let updatedBlocks = draft.blocks.filter((_,i) => i < min || i > max);
 
-  const finalBlocks = updatedBlocks.length === 0 ? 
-                      [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }]
-                        : updatedBlocks;
+      const finalBlocks = updatedBlocks.length === 0 ? 
+                          [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }]
+                            : updatedBlocks;
 
-  if (document.activeElement instanceof HTMLElement) {
-    document.activeElement.blur();
-  }
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
 
-  handleNoteUpdates('blocks', finalBlocks);
-  setMultiSelectRange(null);
-  setTimeout(() => {
-     setFocusedIndex({ index: 0, position: 0 });
-  }, 10);
-}
+      handleNoteUpdates('blocks', finalBlocks);
+      setMultiSelectRange(null);
+      const newIndex = Math.max(0, min - 1);
+      setTimeout(() => {
+            setFocusedIndex({ index: newIndex, position: 0 });
+          }, 10);
+    };
+
+    const handleDragStart = (index: number, e:React.MouseEvent) => {
+      if(e.target === e.currentTarget || e.shiftKey){
+        e.preventDefault()
+        setIsDragging(true);
+        setMultiSelectRange({start: index, end: index})
+      }
+
+      else {
+        setIsDragging(false)
+        setMultiSelectRange(null)
+      }
+    };
+
+    const handleDragEnter = (index: number) => {
+      if(!isDragging || !multiSelectRange) return;
+
+      setMultiSelectRange({...multiSelectRange, end: index});
+    };
+
+    const handleDragEnd = () => {
+      setIsDragging(false)
+    };
+
+    useEffect(() => {
+      const handleGlobalMouseUp = () => setIsDragging(false);
+      window.addEventListener('mouseup', handleGlobalMouseUp);
+      return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+    }, []);
 
     return (
-        <div className="relative w-full h-full mx-auto py-2">
+        <div className={`relative w-full h-full mx-auto py-2 ${isDragging ? 'select-none' : ''}`}
+        onMouseUp = {handleDragEnd}
+        onMouseLeave = {handleDragEnd}
+        onMouseDown={(e) => {
+          if(e.target === e.currentTarget) {
+            setMultiSelectRange(null)
+          }
+        }}
+        >
             {draft?.blocks.map((block, index) => {
               const isSelected = multiSelectRange 
               ? index >= Math.min(multiSelectRange.start, multiSelectRange.end) && 
@@ -128,6 +137,7 @@ const deleteSelectedBlocks = () => {
                     block={block}
                     focusedIndex={focusedIndex}
                     isSelected = {isSelected}
+                    isDragging = {isDragging}
                     onTriggerMenu={(coords) => setMenuState({ index, ...coords })}
                     onCloseMenu={() => setMenuState(null)}
                     onUpdate={(idx, contentValue) => { 
@@ -135,6 +145,8 @@ const deleteSelectedBlocks = () => {
                       handleBlockUpdate(activeNoteId, block.id, { content: contentValue });
                     }}
                     onKeyDown={handleKeyDown}
+                    onMouseDown = {(e) => handleDragStart(index, e)}
+                    onMouseEnter = {() => handleDragEnter(index)}
                 />
               )
             })}
