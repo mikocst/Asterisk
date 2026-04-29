@@ -6,6 +6,19 @@ import NoteArea from './NoteArea/NoteArea'
 const NotebookApp = () => {
   const {setCreatingNote, setActiveNoteId, setIsMakingFolder, activeNoteId, creatingNote, handleNoteFavorite, handleDeleteNote, setDraft,isSearching, setIsSearching} = useNotebook();
 
+  const handleCreateNew = () => {
+    setCreatingNote(true);
+    setActiveNoteId(null);
+    setDraft({
+      title: "",
+      blocks: [{ id: crypto.randomUUID(), type: "text", content: "" }],
+      isFavorited: false,
+      folder: "All Notes",
+      folderId: null,
+      createdAt: Date.now(),
+    });
+  };
+
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {
       if(!e.altKey) {
@@ -16,7 +29,7 @@ const NotebookApp = () => {
 
       if (e.key.toLocaleLowerCase() === 'c') {
         e.preventDefault();
-        setCreatingNote(true);
+        handleCreateNew();
         setActiveNoteId(null);
       }
 

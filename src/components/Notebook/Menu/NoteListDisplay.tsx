@@ -8,7 +8,6 @@ interface NoteListDisplayProps {
 }
 
 const NoteListDisplay = ({noteList, handleNoteClick}: NoteListDisplayProps) => {
-    console.log("Current noteList:", noteList);
   return (
         <div className = "flex flex-col gap-2">
                                 {noteList.map((singleNote) => 

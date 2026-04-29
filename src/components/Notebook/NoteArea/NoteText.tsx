@@ -12,6 +12,8 @@ const NoteText = () => {
     const [multiSelectRange, setMultiSelectRange] = useState<{start: number; end: number} | null>(null);
     const [isDragging, setIsDragging] = useState<boolean>(false);
 
+    const displayBlocks = draft?.blocks && draft.blocks.length > 0 ? draft.blocks : [{ id: 'initial', type: 'text' as Blocktype, content: '' }];
+
     const handleCommand = (commandValue: string) => {
         if (!activeNoteId || !draft?.blocks || !menuState) return;
 
@@ -91,11 +93,6 @@ const NoteText = () => {
         setIsDragging(true);
         setMultiSelectRange({start: index, end: index})
       }
-
-      else {
-        setIsDragging(false)
-        setMultiSelectRange(null)
-      }
     };
 
     const handleDragEnter = (index: number) => {
@@ -124,7 +121,7 @@ const NoteText = () => {
           }
         }}
         >
-            {draft?.blocks.map((block, index) => {
+            {displayBlocks.map((block, index) => {
               const isSelected = multiSelectRange 
               ? index >= Math.min(multiSelectRange.start, multiSelectRange.end) && 
                 index <= Math.max(multiSelectRange.start, multiSelectRange.end)

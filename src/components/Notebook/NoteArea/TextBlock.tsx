@@ -19,11 +19,14 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
   const textBlockRef = useRef<HTMLTextAreaElement>(null);
   const ghostRef = useRef<HTMLSpanElement>(null);
 
+  const [localContent, setLocalContent] = React.useState(block.content)
+
   const handleTextChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const selectionIndex = e.target.selectionStart;
     const lastChar = value[selectionIndex - 1];
 
+    setLocalContent(value);
     onUpdate(index, value);
 
     if(lastChar === '/') {
@@ -58,7 +61,11 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
       const pos = focusedIndex.position ?? 0
       textBlockRef.current.setSelectionRange(pos, pos)
     }
-  },[focusedIndex, index])
+  },[focusedIndex, index]);
+
+  useEffect(() => {
+    setLocalContent(block.content);
+  }, [block.content]);
 
   return (
     <div className={`group relative w-full pb-1 transition-colors duration-150 ${
@@ -76,7 +83,7 @@ const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMe
         >
         <textarea
         ref = {textBlockRef}
-        value = {block.content}
+        value = {localContent}
         onChange = {handleTextChange}
         onKeyDown = {(e) => onKeyDown(e, index)}
         rows = {1}
