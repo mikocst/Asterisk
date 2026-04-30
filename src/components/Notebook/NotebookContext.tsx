@@ -76,6 +76,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const cloudNotes = useQuery(api.notes.getNotes);
     const updateBlocks = useMutation(api.notes.updateNoteBlock);
     const createNote = useMutation(api.notes.createNote);
+    const removeNote = useMutation(api.notes.deleteNoteBlock);
 
     const handleBlockUpdate = async(
         noteId: Id<"notes">,
@@ -207,50 +208,64 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         }
         }, [cloudNotes]);
 
-    const handleDeleteNote = useCallback((id: string) => {
+    const handleDeleteNote = useCallback((id: Id<'notes'>) => {
             setDraft(null)
-            let trashedNote = notes.find(note => note._id === id)
+            let trashedNote = cloudNotes?.find(note => note._id === id)
 
             if(!trashedNote) {
-            console.error("FAILED to find note. Check if ID types match (string vs number)");
             return;
     }
             
             if(trashedNote) {
                 const deletedNoteWithTimestamp = {
                     ...trashedNote,
-                    deletedAt: new Date().toLocaleDateString()
+                    deletedAt: new Date().toLocaleDateString(),
+                    blocks: trashedNote.blocks as Block[]
                 }
-
                 setDeletedNotes(prev => [deletedNoteWithTimestamp, ...prev]);
                 setShowToast(true);
             }
 
-            setNotes(prev => prev.filter(note => note._id !== id))
+            removeNote({noteId: id})
+            
             if (activeNoteId === id) {
                 setDraft(null)
                 setActiveNoteId(null)
                 setCreatingNote(false)
             }
 
-    },[activeNoteId]);
+    },[activeNoteId, cloudNotes, removeNote]);
 
-    const handleUndo = useCallback((id:Id<"notes">) => {
-        setDeletedNotes(prev => {
-            const noteToRestore = prev.find(n => n._id === id)
+    const handleUndo = useCallback(async (id:Id<"notes">) => {
+        const noteToRestore = deletedNotes.find((n) => n._id === id);
 
-            if (noteToRestore) {
-                setNotes(currentNotes => [noteToRestore, ...currentNotes]);
+        if(noteToRestore){
+            try{
+                const {
+                    _id, 
+                    _creationTime, 
+                    deletedAt, 
+                    isFavorited, 
+                    lastModified,
+                    userId,
+                    ...restOfNote
+                } = noteToRestore
+
+                await createNote({
+                    ...restOfNote,
+                    isFavorited: isFavorited ?? false,
+                });
+
+                setDeletedNotes(prev => {
+                const newTrash = prev.filter(n => n._id !== id);
+                if (newTrash.length === 0) setShowToast(false);
+                return newTrash;
+                });
+            } catch(error) {
+                console.error("Failed to restore note:", error)
             }
-
-            if (prev.length === 1) {
-                setShowToast(false)
-            }
-
-            return prev.filter(n => n._id !== id)
-        })
-
-    }, [])
+        }
+    }, [deletedNotes, createNote])
 
     const handleDismissToast = useCallback((id:Id<"notes">) => {
         setDeletedNotes((prev) => prev.filter((note) => 

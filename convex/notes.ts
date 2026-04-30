@@ -59,3 +59,12 @@ export const updateNoteBlock = mutation({
     });
   },
 });
+
+export const deleteNoteBlock = mutation({
+  args: {
+    noteId: v.id("notes"),
+  },
+  handler: async(ctx, args) => {
+    await ctx.db.delete(args.noteId)
+  }
+})

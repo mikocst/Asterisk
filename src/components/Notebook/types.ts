@@ -4,6 +4,8 @@ export interface Note {
     _id: Id<"notes">;
     title: string;
     _creationTime: number;
+    userId: string;      
+    lastModified: number;
     blocks: Array<Block>
     folder: string;
     folderId: string | null
