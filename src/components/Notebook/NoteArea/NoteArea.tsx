@@ -12,7 +12,7 @@ const NoteArea = () => {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
-    <div className = "w-full h-full relative bg-black/3">
+    <div className = "w-full h-full relative bg-black/3 overflow-y-auto">
       {isBusy ? 
         <NoteAreaActive key={activeNoteId}/> : <NoteAreaIdle/> 
       }

@@ -80,7 +80,7 @@ const NotebookApp = () => {
   }, [activeNoteId, creatingNote, setCreatingNote, setActiveNoteId, setIsMakingFolder, handleNoteFavorite, handleDeleteNote, setDraft, isSearching, setIsSearching])
 
   return (
-    <div className = "flex flex-row h-full">
+    <div className = "flex flex-row h-screen w-full overflow-hidden">
         <NoteMenu/>
         <NoteArea/>
       </div>

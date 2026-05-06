@@ -93,7 +93,6 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         updates: Partial<Pick<Block, 'content' | 'type'>>
         ) => {
         if (!draft?.blocks) return;
-        console.log(draft)
 
         setDraft(prev => {
             if(!prev) return prev;
