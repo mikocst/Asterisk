@@ -79,7 +79,7 @@ const NoteText = () => {
         document.activeElement.blur();
       }
 
-      handleNoteUpdates('blocks', finalBlocks);
+      handleNoteUpdates({blocks: finalBlocks});
       setMultiSelectRange(null);
       const newIndex = Math.max(0, min - 1);
       setTimeout(() => {

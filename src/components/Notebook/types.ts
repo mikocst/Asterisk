@@ -8,7 +8,7 @@ export interface Note {
     lastModified: number;
     blocks: Array<Block>
     folder: string;
-    folderId: string | null
+    folderId: Id<"folders"> | null
     deletedAt?: string
     isFavorited?: boolean
 }
@@ -18,12 +18,12 @@ export interface DraftNote {
     createdAt: number;
     blocks: Array<Block>
     folder: string;
-    folderId: string | null
+    folderId: Id<"folders"> | null
     isFavorited?: boolean
 }
 
 export interface Folders {
-    id: string;
+    id: Id<"folders">
     title: string;
 }
 

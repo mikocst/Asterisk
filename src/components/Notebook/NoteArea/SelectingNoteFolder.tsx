@@ -2,6 +2,7 @@ import { Folder, Plus } from "feather-icons-react"
 import { useState, useCallback } from "react"
 import { useNotebook } from "../NotebookContext";
 import { type Folders } from "../types";
+import type { Id } from "@convex/_generated/dataModel";
 
 const SelectingNoteFolder = () => {
 
@@ -14,29 +15,33 @@ const SelectingNoteFolder = () => {
   const folderLabel = draft?.folder ? draft.folder : "Select a Folder";
   const showCreateOption = query.trim().length > 0 && !folders.some(f => f.title.toLowerCase() === query.toLowerCase());
   const totalOptions = showCreateOption ? [...filtered, "Create New"] : filtered;
-  const selectedOption = totalOptions[focusedIndex];
 
    const handleSelectClick = () => {
     setIsSearching(true)
   }
 
-  const handleSelectIndex = (option: string | Folders) => {
-      if(typeof option === "string") {
-        const refinedName = query.trim();
-        const freshId = handleFolders(refinedName);
-        handleNoteUpdates('folder', query);
-        handleNoteUpdates('folderId', freshId)
-      }
+  const handleSelectIndex = async (option: string | Folders) => {
+  let folderData = { folder: "", folderId: null as Id<"folders"> | null };
 
-      else {
-        handleNoteUpdates('folder', option.title);
-        handleNoteUpdates('folderId', option.id);
-      }
-       setIsSearching(false);
-       setQuery("");
-       setFocusedIndex(0);
+  if (typeof option === "string") {
+    const refinedName = query.trim();
+    const freshId = await handleFolders(refinedName);
+
+    if (freshId) {
+      folderData = { folder: refinedName, folderId: freshId };
+    } else {
+      return; 
+    }
+  } else {
+    folderData = { folder: option.title, folderId: option.id };
   }
 
+  handleNoteUpdates(folderData);
+
+  setIsSearching(false);
+  setQuery("");
+  setFocusedIndex(0);
+};
   const handleKeyDown = useCallback((e:React.KeyboardEvent) => {
     if (e.key === "ArrowUp"){
        e.preventDefault();
@@ -49,7 +54,8 @@ const SelectingNoteFolder = () => {
     }
 
     if (e.key === "Enter") {
-      handleSelectIndex(selectedOption)
+      const currentOption = totalOptions[focusedIndex];
+      if(currentOption) handleSelectIndex(currentOption)
     }
 
     if (e.key === "Escape") {

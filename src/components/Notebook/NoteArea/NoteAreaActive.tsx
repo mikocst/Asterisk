@@ -48,7 +48,7 @@ const NoteAreaActive = () => {
         <textarea placeholder="New Note"
         className = "resize-none text-xl h-8 w-full"
         value = {draft?.title || ""}
-        onChange={(e) => handleNoteUpdates('title', e.target.value)}
+        onChange={(e) => handleNoteUpdates({title: e.target.value})}
         />
         <div className = "flex flex-col gap-2 pb-4 border-b border-gray-200">
             <CreatedNoteDate/>

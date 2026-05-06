@@ -14,7 +14,7 @@ export default defineSchema({
     ),
     isFavorited: v.boolean(), 
     folder: v.string(),      
-    folderId: v.union(v.string(), v.null()), 
+    folderId: v.union(v.id("folders"), v.null()), 
     lastModified: v.number(),
     deletedAt: v.optional(v.string()), 
   })

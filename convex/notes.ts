@@ -22,7 +22,7 @@ export const createNote = mutation({
       })
     ),
     folder: v.string(),
-    folderId: v.union(v.string(), v.null()),
+    folderId: v.union(v.id("folders"), v.null()),
     isFavorited: v.boolean()
   },
   handler: async (ctx, args) => {
@@ -41,6 +41,8 @@ export const updateNoteBlock = mutation({
     noteId: v.id("notes"),
     title: v.optional(v.string()),
     isFavorited: v.optional(v.boolean()),
+    folder: v.optional(v.string()),
+    folderId: v.optional(v.id("folders")),
     blocks: v.array(
       v.object({
         id: v.string(),

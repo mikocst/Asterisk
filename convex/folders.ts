@@ -26,3 +26,30 @@ export const getFoldersWithNotes = query({
         return foldersWithDetails
     }
 })
+
+export const createFolder = mutation({
+    args: {title:v.string()},
+    handler: async (ctx, args) => {
+        const userId = "user_123";
+        return await ctx.db.insert("folders", {
+            title: args.title,
+            userId: userId
+        })
+    }
+})
+
+export const removeFolder = mutation({
+    args: {id: v.id("folders")},
+    handler: async(ctx, args) => {
+        await ctx.db.delete(args.id);
+
+        const notes = await ctx.db
+            .query("notes")
+            .withIndex("by_folderId", (q) => q.eq("folderId", args.id))
+            .collect()
+        
+        for (const note of notes) {
+            await ctx.db.delete(note._id)
+        }
+    }
+})
