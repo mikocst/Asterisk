@@ -12,6 +12,7 @@ export default defineSchema({
         content: v.string(),
       })
     ),
+    lexicalData: v.optional(v.string()),
     isFavorited: v.boolean(), 
     folder: v.string(),      
     folderId: v.union(v.id("folders"), v.null()), 

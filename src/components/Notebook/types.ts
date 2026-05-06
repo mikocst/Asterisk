@@ -7,19 +7,21 @@ export interface Note {
     userId: string;      
     lastModified: number;
     blocks: Array<Block>
+    lexicalData?: string;
     folder: string;
-    folderId: Id<"folders"> | null
-    deletedAt?: string
-    isFavorited?: boolean
+    folderId: Id<"folders"> | null;
+    deletedAt?: string;
+    isFavorited?: boolean;
 }
 
 export interface DraftNote {
     title: string;
     createdAt: number;
-    blocks: Array<Block>
+    blocks: Array<Block>;
+    lexicalData?: string;
     folder: string;
-    folderId: Id<"folders"> | null
-    isFavorited?: boolean
+    folderId: Id<"folders"> | null;
+    isFavorited?: boolean;
 }
 
 export interface Folders {

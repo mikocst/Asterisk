@@ -1,162 +1,51 @@
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { useNotebook } from '../NotebookContext';
-import { useState, useRef, useEffect } from 'react';
-import TextAreaMenu from './TextAreaMenu';
-import TextBlock from './TextBlock';
-import type { Blocktype } from '../types';
+import { SyncConvexPlugin } from '../Plugins/SyncConvexPlugin';
 
 const NoteText = () => {
-    const { draft, activeNoteId, handleBlockUpdate, handleBlockSplit, handleBlockMerge, handleNoteUpdates } = useNotebook();
+  const { draft } = useNotebook();
 
-    const [menuState, setMenuState] = useState<{ index: number; top: number; left: number } | null>(null);
-    const [focusedIndex, setFocusedIndex] = useState<{ index: number; position: number } | null>(null);
-    const [multiSelectRange, setMultiSelectRange] = useState<{start: number; end: number} | null>(null);
-    const [isDragging, setIsDragging] = useState<boolean>(false);
-
-    const displayBlocks = draft?.blocks && draft.blocks.length > 0 ? draft.blocks : [{ id: 'initial', type: 'text' as Blocktype, content: '' }];
-
-    const handleCommand = (commandValue: string) => {
-        if (!activeNoteId || !draft?.blocks || !menuState) return;
-
-        const targetBlock = draft.blocks[menuState.index];
-        const formatTypes: Blocktype[] = ['h1', 'h2', 'h3', 'text'];
-        const isFormat = formatTypes.includes(commandValue as Blocktype);
-
-        handleBlockUpdate(activeNoteId, targetBlock.id, {
-            type: isFormat ? (commandValue as Blocktype) : targetBlock.type,
-            content: targetBlock.content.replace('/', '')
-        });
-
-        setMenuState(null);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, index: number) => {
-    const { selectionStart, selectionEnd } = e.currentTarget;
-
-    if (multiSelectRange) {
-        if (e.key === 'Backspace') {
-            e.preventDefault();
-            deleteSelectedBlocks();
-            return;
-        }
-        
-        if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Meta') {
-            setMultiSelectRange(null);
-        }
-    }
-
-    if (e.key === 'Backspace' && selectionStart === 0 && selectionEnd === 0 && index > 0) {
-        e.preventDefault();
-        const previousContent = draft?.blocks[index - 1].content || "";
-        handleBlockMerge(index);
-        setFocusedIndex({
-            index: index - 1,
-            position: previousContent.length
-        });
-        return;
-    }
-
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        handleBlockSplit(index, selectionStart);
-        setFocusedIndex({ index: index + 1, position: 0 });
-    }
-};
-
-    const deleteSelectedBlocks = () => {
-      if (!multiSelectRange || !activeNoteId || !draft) return;
-
-      const {start, end } = multiSelectRange;
-      const min = Math.min(start,end);
-      const max = Math.max(start,end);
-
-      let updatedBlocks = draft.blocks.filter((_,i) => i < min || i > max);
-
-      const finalBlocks = updatedBlocks.length === 0 ? 
-                          [{ id: crypto.randomUUID(), type: 'text' as Blocktype, content: '' }]
-                            : updatedBlocks;
-
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
+  const initialConfig = {
+    namespace: 'AsteriskEditor',
+    onError: (error: Error) => console.error(error),
+    theme: {
+      paragraph: 'relative m-0 quote mb-2',
+      heading: {
+        h1: 'text-3xl font-bold mt-6 mb-2',
+        h2: 'text-2xl font-semibold mt-4 mb-2',
+      },
+      list: {
+        ul: 'list-disc ml-5',
+        ol: 'list-decimal ml-5',
       }
+    },
+  };
 
-      handleNoteUpdates({blocks: finalBlocks});
-      setMultiSelectRange(null);
-      const newIndex = Math.max(0, min - 1);
-      setTimeout(() => {
-            setFocusedIndex({ index: newIndex, position: 0 });
-          }, 10);
-    };
-
-    const handleDragStart = (index: number, e:React.MouseEvent) => {
-      if(e.target === e.currentTarget || e.shiftKey){
-        e.preventDefault()
-        setIsDragging(true);
-        setMultiSelectRange({start: index, end: index})
-      }
-    };
-
-    const handleDragEnter = (index: number) => {
-      if(!isDragging || !multiSelectRange) return;
-
-      setMultiSelectRange({...multiSelectRange, end: index});
-    };
-
-    const handleDragEnd = () => {
-      setIsDragging(false)
-    };
-
-    useEffect(() => {
-      const handleGlobalMouseUp = () => setIsDragging(false);
-      window.addEventListener('mouseup', handleGlobalMouseUp);
-      return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-    }, []);
-
-    return (
-        <div className={`relative w-full h-full mx-auto py-2 ${isDragging ? 'select-none' : ''}`}
-        onMouseUp = {handleDragEnd}
-        onMouseLeave = {handleDragEnd}
-        onMouseDown={(e) => {
-          if(e.target === e.currentTarget) {
-            setMultiSelectRange(null)
+  return (
+    <div className="relative w-full h-full mx-auto py-1">
+      <LexicalComposer initialConfig={initialConfig}>
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable 
+              className="outline-none min-h-125 px-2 py-4 prose prose-slate max-w-none" 
+            />
           }
-        }}
-        >
-            {displayBlocks.map((block, index) => {
-              const isSelected = multiSelectRange 
-              ? index >= Math.min(multiSelectRange.start, multiSelectRange.end) && 
-                index <= Math.max(multiSelectRange.start, multiSelectRange.end)
-              : false;
-
-              return(
-                    <TextBlock
-                    key={block.id}
-                    index={index}
-                    block={block}
-                    focusedIndex={focusedIndex}
-                    isSelected = {isSelected}
-                    isDragging = {isDragging}
-                    onTriggerMenu={(coords) => setMenuState({ index, ...coords })}
-                    onCloseMenu={() => setMenuState(null)}
-                    onUpdate={(idx, contentValue) => { 
-                      if (!draft) return;
-                      handleBlockUpdate(activeNoteId, block.id, { content: contentValue });
-                    }}
-                    onKeyDown={handleKeyDown}
-                    onMouseDown = {(e) => handleDragStart(index, e)}
-                    onMouseEnter = {() => handleDragEnter(index)}
-                />
-              )
-            })}
-
-            {menuState && (
-                <TextAreaMenu
-                    onSelect={handleCommand}
-                    positionTop={menuState.top}
-                    positionLeft={menuState.left}
-                />
-            )}
-        </div>
-    );
+          placeholder={
+            <div className="absolute top-6 left-4 text-gray-400 pointer-events-none">
+              Type '/' for commands...
+            </div>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <HistoryPlugin />
+        <SyncConvexPlugin />
+      </LexicalComposer>
+    </div>
+  );
 };
 
 export default NoteText;
