@@ -14,13 +14,14 @@ export const getNotes = query({
 export const createNote = mutation({
   args: {
     title: v.string(),
-    blocks: v.array(
+    lexicalData: v.optional(v.string()),
+    blocks: v.optional(v.array(
       v.object({
         id: v.string(),
         type: v.string(),
         content: v.string(),
       })
-    ),
+    )),
     folder: v.string(),
     folderId: v.union(v.id("folders"), v.null()),
     isFavorited: v.boolean()
@@ -40,23 +41,23 @@ export const updateNoteBlock = mutation({
   args: {
     noteId: v.id("notes"),
     title: v.optional(v.string()),
+    lexicalData: v.optional(v.string()),
     isFavorited: v.optional(v.boolean()),
     folder: v.optional(v.string()),
     folderId: v.optional(v.id("folders")),
-    blocks: v.array(
+    blocks: v.optional(v.array( 
       v.object({
         id: v.string(),
         type: v.string(),
         content: v.string(),
       })
-    ),
+    )),
   },
   handler: async (ctx, args) => {
     const {noteId, ...updates} = args;
 
     await ctx.db.patch(args.noteId, {
       ...updates,
-      blocks: args.blocks,
       lastModified: Date.now(),
     });
   },

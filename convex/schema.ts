@@ -5,13 +5,13 @@ export default defineSchema({
   notes: defineTable({
     title: v.string(),
     userId: v.string(), 
-    blocks: v.array(
+    blocks: v.optional(v.array(
       v.object({
         id: v.string(),
-        type: v.string(), 
+        type: v.string(),
         content: v.string(),
       })
-    ),
+    )),
     lexicalData: v.optional(v.string()),
     isFavorited: v.boolean(), 
     folder: v.string(),      

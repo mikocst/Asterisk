@@ -204,6 +204,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
             const draftContent : DraftNote = {
                 title: note.title,
+                lexicalData: note.lexicalData,
                 blocks: note.blocks as Block[],
                 isFavorited: note.isFavorited,
                 folder: note.folder,
@@ -317,6 +318,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             await updateBlocks({
                 noteId: activeNoteId,
                 blocks: draft.blocks,
+                lexicalData: draft.lexicalData,
                 title: draft.title,
                 isFavorited: draft.isFavorited,
                 folder: draft.folder ?? undefined,
@@ -329,7 +331,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }, 500); 
 
     return () => clearTimeout(handler);
-    }, [draft?.title, draft?.isFavorited, draft?.folderId, draft?.blocks, draft?.folder, activeNoteId]);
+    }, [draft?.title, draft?.isFavorited, draft?.folderId, draft?.lexicalData, draft?.blocks, draft?.folder, activeNoteId]);
 
     useEffect(() => {
         if(activeNoteId === null && !creatingNote) {

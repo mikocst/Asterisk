@@ -6,8 +6,8 @@ export interface Note {
     _creationTime: number;
     userId: string;      
     lastModified: number;
-    blocks: Array<Block>
     lexicalData?: string;
+    blocks: Array<Block>
     folder: string;
     folderId: Id<"folders"> | null;
     deletedAt?: string;
@@ -17,8 +17,8 @@ export interface Note {
 export interface DraftNote {
     title: string;
     createdAt: number;
-    blocks: Array<Block>;
     lexicalData?: string;
+    blocks: Array<Block>;
     folder: string;
     folderId: Id<"folders"> | null;
     isFavorited?: boolean;

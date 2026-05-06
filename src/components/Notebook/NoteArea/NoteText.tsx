@@ -7,10 +7,11 @@ import { useNotebook } from '../NotebookContext';
 import { SyncConvexPlugin } from '../Plugins/SyncConvexPlugin';
 
 const NoteText = () => {
-  const { draft } = useNotebook();
+  const { draft, activeNoteId } = useNotebook();
 
   const initialConfig = {
     namespace: 'AsteriskEditor',
+    editorState: draft?.lexicalData || undefined,
     onError: (error: Error) => console.error(error),
     theme: {
       paragraph: 'relative m-0 quote mb-2',
@@ -27,7 +28,7 @@ const NoteText = () => {
 
   return (
     <div className="relative w-full h-full mx-auto py-1">
-      <LexicalComposer initialConfig={initialConfig}>
+      <LexicalComposer initialConfig={initialConfig} key = {activeNoteId}>
         <RichTextPlugin
           contentEditable={
             <ContentEditable 
