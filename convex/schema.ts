@@ -17,5 +17,12 @@ export default defineSchema({
     folderId: v.union(v.string(), v.null()), 
     lastModified: v.number(),
     deletedAt: v.optional(v.string()), 
-  }).index("by_user", ["userId"]),
+  })
+  .index("by_user", ["userId"])
+  .index("by_folderId", ["folderId"]),
+
+  folders: defineTable({
+    title: v.string(),
+    userId: v.string()
+  }).index("by_user", ["userId"])
 });
