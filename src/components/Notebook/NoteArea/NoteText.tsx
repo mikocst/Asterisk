@@ -138,7 +138,7 @@ const NoteText = () => {
                     onTriggerMenu={(coords) => setMenuState({ index, ...coords })}
                     onCloseMenu={() => setMenuState(null)}
                     onUpdate={(idx, contentValue) => { 
-                      if (!activeNoteId) return;
+                      if (!draft) return;
                       handleBlockUpdate(activeNoteId, block.id, { content: contentValue });
                     }}
                     onKeyDown={handleKeyDown}

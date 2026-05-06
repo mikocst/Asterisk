@@ -2,15 +2,12 @@ import React from 'react'
 import { Clock } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
 
-//need to link this to an id
-
 const CreatedNoteDate = () => {
 
   const {notes, activeNoteId, creatingNote} = useNotebook();
   if (!activeNoteId && !creatingNote) return null
 
   const currentNote = notes.find((note) => note._id === activeNoteId);
-  const currentDate = new Date();
   const rawDate = currentNote ? currentNote._creationTime : new Date();
 
   const displayDate = new Date(rawDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});

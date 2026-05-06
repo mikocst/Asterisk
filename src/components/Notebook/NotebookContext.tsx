@@ -29,7 +29,7 @@ export interface NoteBookContextProps {
     setIsSearching: (val: boolean) => void
     showToast: boolean
     setShowToast: (show: boolean) => void
-    handleWriting: () => void
+    handleWriting: () => Promise<void>
     handleNoteUpdates: <K extends keyof DraftNote>(key: K, value: DraftNote[K]) => void;
     handleFolders: (newTitle: string) => string
     handleNoteClick: (id: Id<"notes">) => void
@@ -38,7 +38,7 @@ export interface NoteBookContextProps {
     handleDismissToast: (id:Id<"notes">) => void
     handleDeleteFolder:(folderId:string) => void
     handleNoteFavorite:(id: Id<"notes">) => void
-    handleBlockUpdate: (noteId: Id<"notes">,
+    handleBlockUpdate: (noteId: Id<"notes"> | null,
                         blockId: string,
                         updates: Partial<Pick<Block, 'content' | 'type'>>) => void
     handleBlockSplit: (index: number, 
@@ -73,22 +73,27 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     const [showToast, setShowToast] = useState<boolean>(false);
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
+    const isSaving = useRef(false);
+
     const cloudNotes = useQuery(api.notes.getNotes);
     const updateBlocks = useMutation(api.notes.updateNoteBlock);
     const createNote = useMutation(api.notes.createNote);
     const removeNote = useMutation(api.notes.deleteNoteBlock);
 
     const handleBlockUpdate = async(
-        noteId: Id<"notes">,
+        id: Id<"notes"> | null,
         blockId: string,
         updates: Partial<Pick<Block, 'content' | 'type'>>
         ) => {
         if (!draft?.blocks) return;
 
-        const updatedBlocks: Block[] = draft.blocks.map((block) => 
-            block.id === blockId ? { ...block, ...updates } : block
-            );
-        setDraft((prev) => (prev ? { ...prev, blocks: updatedBlocks } : null));
+        setDraft(prev => {
+            if(!prev) return prev;
+            return {
+                ...prev,
+                blocks: prev.blocks.map(b => b.id === blockId ? {...b, ...updates} : b)
+            }
+        })
     }
 
       const handleBlockSplit = (index: number, caretPosition: number) => {
@@ -139,7 +144,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }
 
     const handleWriting = useCallback(async() => {
-        if (activeNoteId) {
+        if (activeNoteId || isSaving.current) {
             return
         }
         if(creatingNote && draft) {
@@ -148,16 +153,15 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
 
              if (draft && hasTitle || hasContent) {
                 try {
-                     await createNote({
+                     const newId = await createNote({
                         title: draft.title,
                         blocks: draft.blocks,
                         folder: draft.folder,
                         folderId: draft.folderId,
                         isFavorited: false
                     })
-                     setDraft(null)
+                     setActiveNoteId(newId)
                      setCreatingNote(false)
-
                 }
                 catch (err) {
                     console.error("Failed to create note:", err)
@@ -316,13 +320,19 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }, 500); 
 
     return () => clearTimeout(handler);
-}, [draft?.title, JSON.stringify(draft?.blocks), draft?.isFavorited, activeNoteId]);
+    }, [draft?.title, draft?.isFavorited, activeNoteId]);
 
     useEffect(() => {
     if (cloudNotes && !activeNoteId) {
         setNotes(cloudNotes as Note[]);
-    }
-}, [cloudNotes, activeNoteId]);
+        }
+    }, [cloudNotes, activeNoteId]);
+
+    useEffect(() => {
+        if(activeNoteId === null && !creatingNote) {
+            setDraft(null)
+        }
+    }, [activeNoteId, creatingNote])
 
 
     const value = {

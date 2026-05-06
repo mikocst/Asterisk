@@ -8,17 +8,12 @@ import { ArrowLeft, Star, Trash } from "feather-icons-react";
 const NoteAreaActive = () => {
   const { handleWriting, draft, handleNoteUpdates, setCreatingNote, handleDeleteNote, setActiveNoteId, activeNoteId, handleNoteFavorite} = useNotebook();
 
-  const draftRef = useRef(handleWriting);
-  draftRef.current = handleWriting;
+  const handleBackClick = async () => {
+    await handleWriting()
 
-  const handleBackClick = () => {
     setCreatingNote(false)
     setActiveNoteId(null)
   }
-
-  useEffect(() => {
-      return () => {draftRef.current()}
-  },[])
 
   return (
     <div
