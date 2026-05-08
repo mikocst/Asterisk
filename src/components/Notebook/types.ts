@@ -36,3 +36,35 @@ export interface Block {
     type: Blocktype;
     content:string
 }
+
+export interface LexicalTextNode {
+  detail: number;
+  format: number;
+  mode: string;
+  style: string;
+  text: string;
+  type: 'text';
+  version: number;
+}
+
+export interface LexicalElementNode {
+  children: (LexicalTextNode | LexicalElementNode)[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+  type: string; 
+  version: number;
+}
+
+export interface LexicalRoot {
+  children: LexicalElementNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+  type: 'root';
+  version: number;
+}
+
+export interface LexicalEditorState {
+  root: LexicalRoot;
+}
