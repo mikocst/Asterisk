@@ -1,12 +1,14 @@
 import React from 'react'
+import type { SlashMenuItem } from '../types'
 
 interface textAreMenuProps {
     positionTop: number
     positionLeft: number
-    onSelect: (symbol: string) => void
+    onSelect: (type: SlashMenuItem) => void
+    query: string
 }
 
-const TextAreaMenu = ({positionTop, positionLeft, onSelect}: textAreMenuProps) => {
+const TextAreaMenu = ({positionTop, positionLeft, onSelect, query}: textAreMenuProps) => {
   return (
   <div 
     style={{ 
@@ -21,7 +23,7 @@ const TextAreaMenu = ({positionTop, positionLeft, onSelect}: textAreMenuProps) =
     <div className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
     onMouseDown = {(e) => {
       e.preventDefault();
-      onSelect("p")
+      onSelect('text')
     }}
     >
         <p className = "pointer-events-none">Text Block</p>

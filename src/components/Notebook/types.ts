@@ -68,3 +68,5 @@ export interface LexicalRoot {
 export interface LexicalEditorState {
   root: LexicalRoot;
 }
+
+export type SlashMenuItem = "h1" | "h2" | "h3" | "bullet" | "quote" | "text"
