@@ -1,20 +1,27 @@
-import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
+import { $createHeadingNode,type HeadingTagType } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { $getSelection, $isRangeSelection } from 'lexical';
-import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
+import { $createListNode } from '@lexical/list';
 import type { LexicalEditor } from 'lexical';
 
-export const transformToH1 = (editor : LexicalEditor) => {
-    
+export const transformToHeading = (editor: LexicalEditor, tag: HeadingTagType) => {
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      $setBlocksType(selection, () => $createHeadingNode('h1'));
+      $setBlocksType(selection, () => $createHeadingNode(tag));
     }
   });
 };
 
-
-export const transformToBulletedList = (editor : LexicalEditor) => {
-  editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+export const transformToBulletedList = (editor: LexicalEditor) => {
+  editor.update(() => {
+    const selection = $getSelection();
+    if ($isRangeSelection(selection)) {
+      $setBlocksType(selection, () => $createListNode("bullet"));
+    }
+  });
 };
+
+export const transformToH1 = (editor: LexicalEditor) => transformToHeading(editor, 'h1');
+export const transformToH2 = (editor: LexicalEditor) => transformToHeading(editor, 'h2');
+export const transformToH3 = (editor: LexicalEditor) => transformToHeading(editor, 'h3');

@@ -5,19 +5,29 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { useNotebook } from '../NotebookContext';
 import { SyncConvexPlugin } from '../Plugins/SyncConvexPlugin';
+import { SlashCommandPlugin } from '../Plugins/SlashCommandPlugin';
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { ListNode, ListItemNode } from "@lexical/list";
 
 const NoteText = () => {
   const { draft, activeNoteId } = useNotebook();
 
   const initialConfig = {
     namespace: 'AsteriskEditor',
+    nodes: [
+      HeadingNode,
+      QuoteNode,
+      ListNode,
+      ListItemNode,
+    ],
     editorState: draft?.lexicalData || undefined,
     onError: (error: Error) => console.error(error),
     theme: {
       paragraph: 'relative m-0 quote mb-2',
       heading: {
-        h1: 'text-3xl font-bold mt-6 mb-2',
-        h2: 'text-2xl font-semibold mt-4 mb-2',
+        h1: 'text-3xl font-bold mb-2',
+        h2: 'text-2xl font-semibold mb-2',
+        h3: 'text-xl font-medium mb-2'
       },
       list: {
         ul: 'list-disc ml-5',
@@ -42,6 +52,7 @@ const NoteText = () => {
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
+        <SlashCommandPlugin/>
         <SyncConvexPlugin />
         <HistoryPlugin/>
       </LexicalComposer>

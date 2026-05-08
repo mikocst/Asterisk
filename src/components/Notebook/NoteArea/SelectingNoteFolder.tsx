@@ -90,7 +90,7 @@ const SelectingNoteFolder = () => {
          className = "rounded-md border border-gray-300 px-2"
          />
          {totalOptions.length > 0 && (
-          <div className = "absolute top-full left-0 min-w-75 bg-white shadow-lg h-auto p-1 rounded-md">
+          <div className = "absolute top-full left-0 min-w-75 bg-white shadow-lg h-auto p-1 rounded-md z-50">
             {totalOptions.map((option, index) =>{
              if( typeof option === "string") {
               return(
