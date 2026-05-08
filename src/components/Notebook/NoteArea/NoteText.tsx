@@ -42,8 +42,8 @@ const NoteText = () => {
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <HistoryPlugin />
         <SyncConvexPlugin />
+        <HistoryPlugin/>
       </LexicalComposer>
     </div>
   );
