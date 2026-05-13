@@ -164,6 +164,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
                      const newId = await createNote({
                         title: draft.title,
                         blocks: draft.blocks,
+                        lexicalData: draft.lexicalData,
                         folder: draft.folder ?? undefined,
                         folderId: draft.folderId,
                         isFavorited: false

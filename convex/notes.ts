@@ -1,5 +1,12 @@
 import { v } from "convex/values";
+import type {LexicalTextNode , LexicalEditorState, LexicalElementNode} from "../src/components/Notebook/types"
 import { mutation, query } from "./_generated/server";
+
+type LexicalNode = LexicalTextNode | LexicalElementNode;
+
+function isTextNode(node: LexicalNode): node is LexicalTextNode {
+  return node.type === 'text';
+}
 
 export const getNotes = query({
   args: {},
@@ -27,8 +34,11 @@ export const createNote = mutation({
     isFavorited: v.boolean()
   },
   handler: async (ctx, args) => {
+    const preview = args.lexicalData ? getPlainTextFromLexical(args.lexicalData) : "";
+
     const noteId = await ctx.db.insert("notes", {
       ...args,
+      preview,
       userId: "user_placeholder", 
       lastModified: Date.now(),
     });
@@ -56,8 +66,14 @@ export const updateNoteBlock = mutation({
   handler: async (ctx, args) => {
     const {noteId, ...updates} = args;
 
+    let preview;
+    if(args.lexicalData !== undefined){
+      preview = getPlainTextFromLexical(args.lexicalData);
+    }
+
     await ctx.db.patch(args.noteId, {
       ...updates,
+      ...(preview !== undefined && {preview}),
       lastModified: Date.now(),
     });
   },
@@ -71,3 +87,31 @@ export const deleteNoteBlock = mutation({
     await ctx.db.delete(args.noteId)
   }
 })
+
+export const getPlainTextFromLexical = (lexicalJSON: string): string => {
+  try {
+    const state: LexicalEditorState = JSON.parse(lexicalJSON);
+    
+    const extract = (nodes: LexicalNode[]): string => {
+      return nodes.map((node) => {
+     
+        if (isTextNode(node)) {
+          return node.text;
+        } 
+      
+        if ('children' in node) {
+          return extract(node.children);
+        }
+        
+        return '';
+      }).join('');
+    };
+
+    const text = extract(state.root.children);
+    
+    return text.length > 100 ? text.substring(0, 100) + "..." : text;
+  } catch (e) {
+    console.error("Failed to parse Lexical state:", e);
+    return "";
+  }
+};

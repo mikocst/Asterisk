@@ -6,6 +6,7 @@ export interface Note {
     _creationTime: number;
     userId: string;      
     lastModified: number;
+    preview?: string;
     lexicalData?: string;
     blocks: Array<Block>
     folder: string;

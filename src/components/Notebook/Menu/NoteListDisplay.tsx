@@ -24,34 +24,6 @@ const NoteListDisplay = ({noteList, handleNoteClick}: NoteListDisplayProps) => {
     )
   }, [isExpanded, sortedNotes]);
 
-  const getLexicalPreview = (lexicalString: string) => {
-    if(!lexicalString) return;
-
-    try {
-    const state: LexicalEditorState = JSON.parse(lexicalString);
-
-    const extractText = (nodes: (LexicalTextNode | LexicalElementNode)[]): string => {
-      return nodes
-        .map((node) => {
-          if (node.type === 'text') {
-            return (node as LexicalTextNode).text;
-          } else if ('children' in node) {
-            return extractText(node.children);
-          }
-          return "";
-        })
-        .join("");
-    };
-
-    const fullText = extractText(state.root.children);
-    return fullText.trim() || "Empty note";
-    
-  } catch (e) {
-        console.error("Error parsing Lexical JSON", e);
-        return "Preview unavailable";
-    }
-  }
-
 
   return (
         <div className = "flex flex-col gap-4 w-full">
@@ -70,7 +42,7 @@ const NoteListDisplay = ({noteList, handleNoteClick}: NoteListDisplayProps) => {
                         }) : "Just now"}:
                     </p>
                     <p className = "truncate max-w-[17ch]">
-                      {singleNote.lexicalData ? getLexicalPreview(singleNote.lexicalData) : "No Content"}
+                      {singleNote.lexicalData ? singleNote.preview : "No Content"}
                     </p>
                     </div>
                 </div>
