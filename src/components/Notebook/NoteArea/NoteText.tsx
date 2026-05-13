@@ -8,6 +8,7 @@ import { SyncConvexPlugin } from '../Plugins/SyncConvexPlugin';
 import { SlashCommandPlugin } from '../Plugins/SlashCommandPlugin';
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 
 const NoteText = () => {
   const { draft, activeNoteId } = useNotebook();
@@ -52,6 +53,7 @@ const NoteText = () => {
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
+        <ListPlugin/>
         <SlashCommandPlugin/>
         <SyncConvexPlugin />
         <HistoryPlugin/>
