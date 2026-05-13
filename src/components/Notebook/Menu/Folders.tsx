@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Folder, Trash } from 'feather-icons-react'
 import { useNotebook } from '../NotebookContext'
 import { AnimatePresence, motion } from 'motion/react';
@@ -14,6 +14,11 @@ const Folders = () => {
   const [hover, setHover] = useState<string |null>(null);
   const [openFolderIds, setOpenFolderIds] = useState<string[]>([]);
   const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  const folderList = useMemo(() => {
+    return(isExpanded ? folders : folders.slice(0,3))
+  },[folders, isExpanded])
 
   const isDuplicate = folders.some((folder) => 
     folder.title.toLowerCase() === folderName.trim().toLowerCase()
@@ -101,75 +106,97 @@ const Folders = () => {
                 <Plus size={'20px'}/>
             </button>
         </div>
-        <div className = "w-full flex flex-col justify-center gap-1">
-            {folders.map((folder) => {
-                const isOpen = openFolderIds.includes(folder.id);
-                const folderNotes = notes.filter((note) => 
-                    note.folderId === folder.id
-                )
+        <div>
+            <div className = "w-full flex flex-col justify-center gap-1">
+                {folderList.map((folder) => {
+                    const isOpen = openFolderIds.includes(folder.id);
+                    const folderNotes = notes.filter((note) => 
+                        note.folderId === folder.id
+                    )
 
-                return (
-                        <div
-                        key={folder.id}
-                        className = "flex flex-col">
-                            <div 
-                            onClick = {() => toggleFolder(folder.id)}
-                            onMouseEnter = {() => handleMouseEnter(folder.id)}
-                            onMouseLeave = {handleMouseLeave}
-                            className = "flex flex-row justify-between p-1 items-center cursor-pointer h-9"
-                            >
-                                <div className = "flex flex-row gap-2 items-center text-gray-500">
-                                    <Folder size = {'16px'}/>
-                                    <h3>{folder.title}</h3>
+                    return (
+                            <div
+                            key={folder.id}
+                            className = "flex flex-col">
+                                <div 
+                                onClick = {() => toggleFolder(folder.id)}
+                                onMouseEnter = {() => handleMouseEnter(folder.id)}
+                                onMouseLeave = {handleMouseLeave}
+                                className = "flex flex-row justify-between p-1 items-center cursor-pointer h-9"
+                                >
+                                    <div className = "flex flex-row gap-2 items-center text-gray-500">
+                                        <Folder size = {'16px'}/>
+                                        <h3>{folder.title}</h3>
+                                    </div>
+                                    <AnimatePresence>
+                                        {hover === folder.id && (
+                                        <motion.div
+                                        onClick = {(e) => handleDeleteModal(e, folder.id)}
+                                        initial = {{opacity: 0}}
+                                        animate = {{opacity: 1}}
+                                        exit = {{opacity: 0}}
+                                        transition = {{ease: 'easeOut', duration: 0.2}}
+                                        className = "text-red-500 border border-gray-300 rounded-md p-1 hover:bg-gray-200"
+                                        >
+                                            <Trash size = {`16px`}/>
+                                        </motion.div>
+                                    )}
+                                    </AnimatePresence>
                                 </div>
-                                <AnimatePresence>
-                                    {hover === folder.id && (
-                                    <motion.div
-                                    onClick = {(e) => handleDeleteModal(e, folder.id)}
-                                    initial = {{opacity: 0}}
-                                    animate = {{opacity: 1}}
-                                    exit = {{opacity: 0}}
-                                    transition = {{ease: 'easeOut', duration: 0.2}}
-                                    className = "text-red-500 border border-gray-300 rounded-md p-1 hover:bg-gray-200"
-                                    >
-                                        <Trash size = {`16px`}/>
-                                    </motion.div>
+                                {isOpen && (
+                                <div className = "flex flex-col ml-4">
+                                    <NoteListDisplay
+                                        noteList={folderNotes}
+                                        handleNoteClick={handleNoteClick}
+                                    />
+                                </div>
                                 )}
-                                </AnimatePresence>
                             </div>
-                            {isOpen && (
-                            <div className = "flex flex-col ml-4">
-                                <NoteListDisplay
-                                    noteList={folderNotes}
-                                    handleNoteClick={handleNoteClick}
-                                />
-                            </div>
-                            )}
-                          </div>
-                        )
-            })}
-            {isMakingFolder &&
-            <div className = "flex flex-col gap-1"> 
-                <div className = "flex flex-row gap-2 items-center">
-                    <Folder size = {'16px'}/>
-                    <input
-                    onKeyDown={handleUpdatingFolderName}
-                    onChange={handleFolderName} 
-                    value = {folderName}
-                    placeholder='Enter Folder Name'
-                    autoFocus = {true}
-                    onBlur = {handleBlur}
-                    className = {`border px-2 rounded-md text-gray-500 ${error ? 'border-red-500' : 'border-gray-200'}`}
-                    />
+                            )
+                })}
+                {isMakingFolder &&
+                <div className = "flex flex-col gap-1"> 
+                    <div className = "flex flex-row gap-2 items-center">
+                        <Folder size = {'16px'}/>
+                        <input
+                        onKeyDown={handleUpdatingFolderName}
+                        onChange={handleFolderName} 
+                        value = {folderName}
+                        placeholder='Enter Folder Name'
+                        autoFocus = {true}
+                        onBlur = {handleBlur}
+                        className = {`border px-2 rounded-md text-gray-500 ${error ? 'border-red-500' : 'border-gray-200'}`}
+                        />
+                    </div>
+                    {error && (
+                        <p className = "text-red-500 text-sm">{error}</p>
+                    )}
                 </div>
-                {error && (
-                    <p className = "text-red-500 text-sm">{error}</p>
-                )}
+                }
+                {(folders.length === 0 && !isMakingFolder) && 
+                <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
+                }
+                {folders.length > 3 && (
+                <div className = "text-end">
+                     {isExpanded ? (
+                      <button
+                      onClick = {() =>setIsExpanded(false)}
+                      className='text-gray-500/70 text-sm hover:text-gray-500 cursor-pointer'
+                      >
+                        See Less
+                      </button>
+                     ):
+                     (
+                      <button
+                      onClick = {() =>setIsExpanded(true)}
+                      className='text-gray-500/70 text-sm hover:text-gray-500 cursor-pointer'
+                      >
+                        See More
+                      </button>
+                     )}
+                  </div>
+            )}
             </div>
-            }
-            {(folders.length === 0 && !isMakingFolder) && 
-            <p className = "text-sm text-gray-400 text-center">No Folders Available</p>
-            }
         </div>
         <AnimatePresence>
             {folderToDelete && (
