@@ -34,6 +34,7 @@ const NoteText = () => {
       list: {
         ul: 'list-disc ml-5',
         ol: 'list-decimal ml-5',
+        nested: {listitem: 'list-none'} ,
       }
     },
   };
