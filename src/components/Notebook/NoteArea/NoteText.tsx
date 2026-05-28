@@ -9,6 +9,7 @@ import { SlashCommandPlugin } from '../Plugins/SlashCommandPlugin';
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { TabEscapePlugin } from '../Plugins/TabEscapePlugin';
 
 const NoteText = () => {
   const { draft, activeNoteId } = useNotebook();
@@ -55,6 +56,7 @@ const NoteText = () => {
         />
         <ListPlugin/>
         <SlashCommandPlugin/>
+        <TabEscapePlugin/>
         <SyncConvexPlugin />
         <HistoryPlugin/>
       </LexicalComposer>
