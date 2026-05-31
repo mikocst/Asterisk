@@ -29,6 +29,7 @@ export const createNote = mutation({
         content: v.string(),
       })
     )),
+    preview: v.optional(v.string()),
     folder: v.string(),
     folderId: v.union(v.id("folders"), v.null()),
     isFavorited: v.boolean()
