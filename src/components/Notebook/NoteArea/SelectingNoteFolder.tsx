@@ -69,12 +69,11 @@ const SelectingNoteFolder = () => {
     if(!isSearching) return;
     const handleOutsideClick = (event: MouseEvent) => {
       if(menuRef.current && !menuRef.current.contains(event.target as Node)){
-        setIsSearching(false)
+        setIsSearching(false);
+        setQuery("");
+        setFocusedIndex(0);
       }
     };
-
-    setQuery("");
-    setFocusedIndex(0);
 
     document.addEventListener("mousedown", handleOutsideClick);
 
