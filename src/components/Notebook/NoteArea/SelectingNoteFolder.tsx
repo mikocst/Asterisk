@@ -1,5 +1,5 @@
 import { Folder, Plus } from "feather-icons-react"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { useNotebook } from "../NotebookContext";
 import { type Folders } from "../types";
 import type { Id } from "@convex/_generated/dataModel";
@@ -10,6 +10,7 @@ const SelectingNoteFolder = () => {
 
   const [query, setQuery] = useState<string>("");
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const filtered = folders.filter(f => f.title.toLowerCase().includes(query.toLowerCase()));
   const folderLabel = draft?.folder ? draft.folder : "Select a Folder";
@@ -64,6 +65,24 @@ const SelectingNoteFolder = () => {
     }
   },[totalOptions, focusedIndex, handleSelectIndex]);
 
+  useEffect(() => {
+    if(!isSearching) return;
+    const handleOutsideClick = (event: MouseEvent) => {
+      if(menuRef.current && !menuRef.current.contains(event.target as Node)){
+        setIsSearching(false)
+      }
+    };
+
+    setQuery("");
+    setFocusedIndex(0);
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick)
+    }
+  }, [isSearching])
+
   return (
     !isSearching ? (
       <div 
@@ -76,7 +95,10 @@ const SelectingNoteFolder = () => {
             </div>
     </div>
     ) : (
-      <div className = "relative flex flex-row gap-2">
+      <div
+      ref = {menuRef} 
+      className = "relative flex flex-row gap-2"
+      >
         <Folder size={"20px"} className = "text-black/50"/>
         <input
          id = 'folder-select'
