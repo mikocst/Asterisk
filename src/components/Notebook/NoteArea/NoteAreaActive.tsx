@@ -12,6 +12,18 @@ const NoteAreaActive = () => {
 
     setCreatingNote(false)
     setActiveNoteId(null)
+  };
+
+  const handleKeyDown = async (e:React.KeyboardEvent<HTMLTextAreaElement>) => {
+    let titleText = e.currentTarget;
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if(!activeNoteId) {
+        await handleWriting();
+      }
+      titleText.blur();
+    }
   }
 
   return (
@@ -45,10 +57,11 @@ const NoteAreaActive = () => {
             </button>
           </div>
         </div>
-        <textarea placeholder="New Note"
+        <textarea placeholder="New Note Title"
         className = "resize-none text-xl h-8 w-full"
         value = {draft?.title || ""}
         onChange={(e) => handleNoteUpdates({title: e.target.value})}
+        onKeyDown={handleKeyDown}
         />
         <div className = "flex flex-col gap-2 pb-4 border-b border-gray-200">
             <CreatedNoteDate/>

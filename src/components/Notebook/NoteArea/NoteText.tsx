@@ -40,8 +40,10 @@ const NoteText = () => {
   };
 
   return (
-    <div className="relative w-full h-full mx-auto py-1">
-      <LexicalComposer initialConfig={initialConfig} key = {activeNoteId}>
+    <div 
+    className="relative w-full h-full mx-auto py-1"
+    >
+      <LexicalComposer initialConfig={initialConfig} key = {activeNoteId} >
         <RichTextPlugin
           contentEditable={
             <ContentEditable 
@@ -49,7 +51,10 @@ const NoteText = () => {
             />
           }
           placeholder={
-            <div className="absolute top-6 left-4 text-gray-400 pointer-events-none">
+            <div
+            className="absolute top-6 left-4 text-gray-400 pointer-events-none"
+            id = "note-body-area"
+            >
               Type '/' for commands...
             </div>
           }
