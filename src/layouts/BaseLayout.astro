@@ -1,6 +1,7 @@
 ---
  import '../styles/global.css'
  import '@fontsource/space-grotesk'
+ import { AuthProvider } from '../components/AuthProvider';
 ---
 
 <html lang="en">
@@ -10,9 +11,11 @@
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Asterisk Notes</title>
+		<title>Asterisk</title>
 	</head>
 	<body class = "h-screen">
-		<slot />
+		<AuthProvider client:load>
+			<slot />
+		</AuthProvider>
 	</body>
 </html>

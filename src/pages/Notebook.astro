@@ -1,10 +1,10 @@
 ---
  import '../styles/global.css'
- import NotebookLayout from '../layouts/NoteLayout.astro'
+ import BaseLayout from '../layouts/BaseLayout.astro'
  import NoteUI from '../components/Notebook/index'
  
 ---
 
-<NotebookLayout>
+<BaseLayout>
 	<NoteUI client:only = "react"/>
-</NotebookLayout>
+</BaseLayout>
