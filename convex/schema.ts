@@ -10,7 +10,7 @@ export default defineSchema({
 
   notes: defineTable({
     title: v.string(),
-    userId: v.string(), 
+    userId: v.id('users'), 
     blocks: v.optional(v.array(
       v.object({
         id: v.string(),
@@ -31,6 +31,6 @@ export default defineSchema({
 
   folders: defineTable({
     title: v.string(),
-    userId: v.string()
+    userId: v.id('users')
   }).index("by_user", ["userId"])
 });
