@@ -10,6 +10,7 @@
 
 import type * as folders from "../folders.js";
 import type * as notes from "../notes.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   folders: typeof folders;
   notes: typeof notes;
+  users: typeof users;
 }>;
 
 /**
