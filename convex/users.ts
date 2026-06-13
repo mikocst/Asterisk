@@ -1,4 +1,4 @@
-import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
 export const storeUser = mutation({
   args: {},
@@ -17,7 +17,6 @@ export const storeUser = mutation({
       return existingUser._id;
     }
 
-    // First time logging in! Build their profile row
     return await ctx.db.insert("users", {
       name: identity.name ?? "Anonymous Asterisk User",
       tokenIdentifier: identity.tokenIdentifier,

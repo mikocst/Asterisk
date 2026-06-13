@@ -5,11 +5,24 @@ import { ConvexReactClient, Authenticated, Unauthenticated, AuthLoading } from "
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { SignInButton } from "@clerk/astro/react";
 import { useAuth } from "@clerk/astro/react";
+import { useEffect } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 
 
 const convexUrl = import.meta.env.PUBLIC_CONVEX_URL;
 
 const convex = new ConvexReactClient(convexUrl);
+
+function WorkspaceSyncShell() {
+  const syncUser = useMutation(api.users.storeUser);
+
+  useEffect(() => {
+    syncUser().catch((err) => console.error("Failed to provision workspace session:", err))
+  }, [syncUser])
+
+  return <NotebookApp/>
+}
 
 const Index = () => {
   return (
@@ -37,9 +50,8 @@ const Index = () => {
             </div>
           </Unauthenticated>
           <Authenticated>
-            <NotebookApp />
+            <WorkspaceSyncShell/>
           </Authenticated>
-
         </NotebookProvider>
       </ConvexProviderWithClerk>
     </React.StrictMode>
