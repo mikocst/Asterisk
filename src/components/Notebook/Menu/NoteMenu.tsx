@@ -13,7 +13,9 @@ const NoteMenu = () => {
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const isSearching = searchQuery.trim().length > 0;
-  const filteredNotes = notes.filter(n => n.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const noramlizedQuery = searchQuery.toLowerCase();
+  const filteredNotes = isSearching ? 
+                        notes.filter(n => n.title.toLowerCase().includes(noramlizedQuery) || n.preview?.toLowerCase().includes(noramlizedQuery)) : []
 
   return (
     <div className = "flex flex-col h-full w-xs bg-gray-100/50 p-4 border-r border-gray-200 gap-4">
