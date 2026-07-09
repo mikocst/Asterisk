@@ -17,7 +17,6 @@ interface TextBlockProps {
 
 const TextBlock = ({index, focusedIndex, block, onUpdate, onKeyDown, onTriggerMenu, onCloseMenu, isSelected, onMouseDown, onMouseEnter, isDragging}: TextBlockProps) => {
   const textBlockRef = useRef<HTMLTextAreaElement>(null);
-  const ghostRef = useRef<HTMLSpanElement>(null);
 
   const [localContent, setLocalContent] = React.useState(block.content)
 

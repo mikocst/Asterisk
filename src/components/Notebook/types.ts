@@ -19,6 +19,7 @@ export interface DraftNote {
     title: string;
     createdAt: number;
     lexicalData?: string;
+    textContent?: string;
     blocks: Array<Block>;
     folder: string;
     folderId: Id<"folders"> | null;

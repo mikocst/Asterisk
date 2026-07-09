@@ -42,6 +42,7 @@ export interface NoteBookContextProps {
     handleBlockSplit: (index: number, 
                        caretPosition: number) => void
     handleBlockMerge: (index: number) => void
+    handleExitNote: () => Promise<void>
 }
 
 
@@ -156,21 +157,30 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         }
         if(creatingNote && draft) {
             const hasTitle = draft?.title.trim() !== "";
-            const hasContent = draft?.blocks && draft.blocks[0]?.content.trim() !== "";
+            const hasContent = draft?.textContent && draft.textContent.trim() !== ""
             const hasFolder = !!draft?.folderId
 
              if (draft && (hasTitle || hasContent || hasFolder)) {
+                let noteTitle = draft.title
+                if(noteTitle.trim() === ""){
+                    noteTitle = "Untilted Note"
+                }
+    
                 try {
                      const newId = await createNote({
-                        title: draft.title,
+                        title: noteTitle,
                         blocks: draft.blocks,
                         lexicalData: draft.lexicalData,
                         folder: draft.folder ?? undefined,
                         folderId: draft.folderId,
                         isFavorited: false
                     })
-                     setActiveNoteId(newId)
-                     setCreatingNote(false)
+                     setActiveNoteId(newId);
+                     setCreatingNote(false);
+
+                     if(draft.title.trim() === ""){
+                        handleNoteUpdates({title: noteTitle})
+                     }
                 }
                 catch (err) {
                     console.error("Failed to create note:", err)
@@ -178,7 +188,14 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
             
          }
         } 
-    }, [draft, activeNoteId, createNote, creatingNote])
+    }, [draft, activeNoteId, createNote, creatingNote]);
+
+    const handleExitNote = useCallback(async() => {
+        await handleWriting();
+
+        setCreatingNote(false)
+        setActiveNoteId(null)
+    }, [handleWriting])
 
     const handleNoteUpdates = useCallback((updates: Partial<DraftNote>) => {
     setDraft(prev => prev ? { ...prev, ...updates } : null);
@@ -312,27 +329,34 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
     }, [deleteFolderMutation, activeNoteId]) 
 
     useEffect(() => {
-    if (!activeNoteId || !draft) return;
+    if (!draft) return;
 
-    const handler = setTimeout(async () => {
-        try {
-            await updateBlocks({
-                noteId: activeNoteId,
-                blocks: draft.blocks,
-                lexicalData: draft.lexicalData,
-                title: draft.title,
-                isFavorited: draft.isFavorited,
-                folder: draft.folder ?? undefined,
-                folderId: draft.folderId ?? undefined
-            });
-            
-        } catch (err) {
-            console.error("Sync failed:", err);
-        }
-    }, 500); 
+            const handler = setTimeout(async () => {
+                if(activeNoteId) {
+                    try {
+                    await updateBlocks({
+                        noteId: activeNoteId,
+                        blocks: draft.blocks,
+                        lexicalData: draft.lexicalData,
+                        title: draft.title,
+                        isFavorited: draft.isFavorited,
+                        folder: draft.folder ?? undefined,
+                        folderId: draft.folderId ?? undefined
+                    });
+                    
+                  } catch (err) {
+                    console.error("Sync failed:", err);
+                    }
+                }
 
-    return () => clearTimeout(handler);
-    }, [draft?.title, draft?.isFavorited, draft?.folderId, draft?.lexicalData, draft?.blocks, draft?.folder, activeNoteId]);
+                else {
+                    if(draft.title || draft.lexicalData) {
+                        handleWriting()
+                    }
+                }
+            }, 1000);
+            return () => clearTimeout(handler);
+        }, [draft?.title, draft?.isFavorited, draft?.folderId, draft?.lexicalData, draft?.blocks, draft?.folder, activeNoteId, handleWriting]);
 
     useEffect(() => {
         if(activeNoteId === null && !creatingNote) {
@@ -365,6 +389,7 @@ export const NotebookProvider = ({children}: NotebookProviderProps) => {
         folders,
 
         handleWriting,
+        handleExitNote,
         handleNoteUpdates,
         handleFolders,
         handleNoteClick,

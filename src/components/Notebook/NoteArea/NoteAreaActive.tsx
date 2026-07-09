@@ -5,13 +5,10 @@ import { useNotebook } from "../NotebookContext";
 import { ArrowLeft, Star, Trash } from "feather-icons-react";
 
 const NoteAreaActive = () => {
-  const { handleWriting, draft, handleNoteUpdates, setCreatingNote, handleDeleteNote, setActiveNoteId, activeNoteId, handleNoteFavorite} = useNotebook();
+  const { handleWriting, draft, handleNoteUpdates, handleDeleteNote, activeNoteId, handleNoteFavorite, handleExitNote} = useNotebook();
 
   const handleBackClick = async () => {
-    await handleWriting()
-
-    setCreatingNote(false)
-    setActiveNoteId(null)
+    await handleExitNote();
   };
 
   const handleKeyDown = async (e:React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -59,7 +56,7 @@ const NoteAreaActive = () => {
         </div>
         <textarea placeholder="New Note Title"
         className = "resize-none text-xl h-8 w-full"
-        value = {draft?.title || ""}
+        value = {draft?.title}
         onChange={(e) => handleNoteUpdates({title: e.target.value})}
         onKeyDown={handleKeyDown}
         />
